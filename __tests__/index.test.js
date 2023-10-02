@@ -27,14 +27,18 @@ describe('/api/topics',()=>{
     })
 })
 
-describe.only('/api',()=>{
+describe('/api',()=>{
     test('get request will return a status code 200 and an object containing the api data',()=>{
         return request(app)
         .get('/api')
         .expect(200)
         .then((response)=>{
             expect(typeof response.body).toBe('object')
-            expect(Object.keys(response.body).includes('GET /api/articles')).toBe(true)
+            for(const endpoint in response.body){
+                expect(Object.keys(response.body[endpoint]).includes('description'))
+                expect(Object.keys(response.body[endpoint]).includes('queries'))
+                expect(Object.keys(response.body[endpoint]).includes('exampleResponse'))
+            }
         })
         
         })
