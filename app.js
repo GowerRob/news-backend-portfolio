@@ -11,8 +11,21 @@ app.all('/*',(req,res,next)=>{
 })
 
 
+//Error Handing
+app.use((err,req,res,next)=>{
+    //An invalid request
+    if(err.code==="22P02"){
+      res.status(400).send({msg:'Bad request'})
+    }
+    next(err);
+  });
 
-
+app.use((err,req,res,next)=>{
+    if(err.status){
+        res.status(err.status).send({msg: err.msg});
+    }
+    next(err)
+})
 
 
 app.use((err,req,res,next)=>{

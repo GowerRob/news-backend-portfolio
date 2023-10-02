@@ -27,12 +27,10 @@ describe('/api/topics',()=>{
     })
 
     test('when a non-existant endpoint is provided, return 404/bad request',()=>{
-
         return request(app)
         .get('/api/bananas')
         .expect(404)
         .then((res)=>{
-
             expect(res.body.msg).toBe('bad request')
         })
     })
@@ -46,26 +44,48 @@ describe('GET /api/articles/:article_id',()=>{
         .expect(200)
     })
 
-    test.only('to retrieve an article by its id passed in the endpoint path',()=>{
+
+    test('to retrieve an article by its id passed in the endpoint path DYNAMIC',()=>{
         return request(app)
-        .get('/api/articles/4')
+        .get('/api/articles/2')
         .then((response)=>{
+            console.log(response)
+            expect(response.body.article).toMatchObject({
+                author: expect.any(String),
+                article_id: expect.any(Number),
+                title: expect.any(String),
+                topic: expect.any(String),
+                body: expect.any(String),
+                created_at: expect.any(String),
+                article_img_url: expect.any(String),
+                votes: expect.any(Number)
+        })
 
-            const {article_id,title,topic,author,body,created_at,votes,article_img_url}=response.body.article
-            console.log(article_id)
-            expect(article_id).toBe(4);
-            expect(title).toBe("Student SUES Mitch!");
-            expect(author).toBe( "rogersop");
-            expect(body).toBe("We all love Mitch and his wonderful, unique typing style. However, the volume of his typing has ALLEGEDLY burst another students eardrums, and they are now suing for damages");
+    })
+    })
 
+
+
+    test('to get a 404 and sends an appropriate status and error message when given a valid but non-existent id',()=>{
+        return request(app)
+        .get('/api/articles/999')
+        .expect(404)
+        .then((response)=>{
+            expect(response.body.msg).toBe('Article does not exist')
         })
     })
-    test('to get a 404 and sends an appropriate status and error message when given a valid but non-existent id',()=>{
-
-
-        
+    test('to get a 400 and sends an appropriate status and error message when given an invalid code',()=>{
+        return request(app)
+        .get('/api/articles/give-me-the-best-article')
+        .expect(400)
+        .then((response)=>{
+            expect(response.body.msg).toBe('Bad request')
+        })
     })
 
 
 
-})
+
+
+
+});
