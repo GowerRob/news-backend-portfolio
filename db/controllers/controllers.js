@@ -14,9 +14,6 @@ exports.getApi = (req,res)=>{
         const apiData=JSON.parse(file);
         res.status(200).send(apiData)
     })
-
-
-
 }
 
 exports.getArticleById = (req, res,next)=>{

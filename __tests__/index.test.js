@@ -63,7 +63,7 @@ describe('GET /api/articles/:article_id',()=>{
         .expect(200)
     })
 
-    test.only('to retrieve an article by its id passed in the endpoint path',()=>{
+    test('to retrieve an article by its id passed in the endpoint path',()=>{
         return request(app)
         .get('/api/articles/4')
         .then((response)=>{
@@ -80,7 +80,6 @@ describe('GET /api/articles/:article_id',()=>{
     test('to get a 404 and sends an appropriate status and error message when given a valid but non-existent id',()=>{
 
 
-        
     })
 
 
