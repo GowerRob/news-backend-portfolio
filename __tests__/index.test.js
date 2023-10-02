@@ -26,5 +26,15 @@ describe('/api/topics',()=>{
         })
     })
 
+    test('when a non-existant endpoint is provided, return 404/bad request',()=>{
+
+        return request(app)
+        .get('/api/bananas')
+        .expect(404)
+        .then((res)=>{
+
+            expect(res.body.msg).toBe('bad request')
+        })
+    })
 
 })
