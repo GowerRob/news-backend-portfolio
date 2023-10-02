@@ -64,7 +64,6 @@ describe('GET /api/articles/:article_id',()=>{
     })
 
 
-
     test('to get a 404 and sends an appropriate status and error message when given a valid but non-existent id',()=>{
         return request(app)
         .get('/api/articles/999')
