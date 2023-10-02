@@ -25,6 +25,23 @@ describe('/api/topics',()=>{
             })
         })
     })
+})
+
+describe('/api',()=>{
+    test('get request will return a status code 200 and an object containing the api data',()=>{
+        return request(app)
+        .get('/api')
+        .expect(200)
+        .then((response)=>{
+            expect(typeof response.body).toBe('object')
+            for(const endpoint in response.body){
+                expect(Object.keys(response.body[endpoint]).includes('description'))
+                expect(Object.keys(response.body[endpoint]).includes('queries'))
+                expect(Object.keys(response.body[endpoint]).includes('exampleResponse'))
+            }
+        })
+        
+        })
 
     test('when a non-existant endpoint is provided, return 404/bad request',()=>{
         return request(app)
@@ -79,7 +96,7 @@ describe('GET /api/articles/:article_id',()=>{
         .then((response)=>{
             expect(response.body.msg).toBe('Bad request')
         })
-    })
+    });
 
 
 });
