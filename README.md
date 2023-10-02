@@ -1,3 +1,13 @@
-# Northcoders News API
+# Backend API for accessing application data programmatically
 
-For instructions, please head over to [L2C NC News](https://l2c.northcoders.com/courses/be/nc-news).
+This project will require you to create your own .env files locally.
+
+Please follow the below instructions:
+
+-In you root directory create a file called .env.test file.
+-It's contents should be 
+    PGDATABASE=nc_news_test
+
+-Also in your root directoy create a file called .env.development.
+It's contents should be 
+    PGDATABASE=nc_news
