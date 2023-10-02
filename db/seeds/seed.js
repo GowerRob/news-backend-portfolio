@@ -6,7 +6,7 @@ const {
   formatComments,
 } = require('./utils');
 
-const seed = ({ topicData, userData, articleData, commentData }) => {
+const seed = ( {topicData, userData, articleData, commentData} ) => {
   return db
     .query(`DROP TABLE IF EXISTS comments;`)
     .then(() => {
@@ -59,6 +59,7 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
       );`);
     })
     .then(() => {
+      console.log(topicData)
       const insertTopicsQueryStr = format(
         'INSERT INTO topics (slug, description) VALUES %L;',
         topicData.map(({ slug, description }) => [slug, description])
