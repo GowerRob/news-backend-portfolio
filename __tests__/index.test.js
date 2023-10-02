@@ -49,7 +49,6 @@ describe('GET /api/articles/:article_id',()=>{
         return request(app)
         .get('/api/articles/2')
         .then((response)=>{
-            console.log(response)
             expect(response.body.article).toMatchObject({
                 author: expect.any(String),
                 article_id: expect.any(Number),
