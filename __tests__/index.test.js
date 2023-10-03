@@ -13,7 +13,6 @@ describe('/api/topics',()=>{
         .get('/api/topics')
         .expect(200)
     })
-
     test('GET request should return an array of topic objects',()=>{
         return request(app)
         .get('/api/topics')
@@ -26,6 +25,7 @@ describe('/api/topics',()=>{
         })
     })
 })
+
 
 describe('/api',()=>{
     test('get request will return a status code 200 and an object containing the api data',()=>{
@@ -42,7 +42,6 @@ describe('/api',()=>{
         })
         
         })
-
     test('when a non-existant endpoint is provided, return 404/bad request',()=>{
         return request(app)
         .get('/api/bananas')
@@ -60,8 +59,6 @@ describe('GET /api/articles/:article_id',()=>{
         .get('/api/articles/4')
         .expect(200)
     })
-
-
     test('to retrieve an article by its id passed in the endpoint path DYNAMIC',()=>{
         return request(app)
         .get('/api/articles/2')
@@ -75,12 +72,9 @@ describe('GET /api/articles/:article_id',()=>{
                 created_at: expect.any(String),
                 article_img_url: expect.any(String),
                 votes: expect.any(Number)
+            })
         })
-
     })
-    })
-
-
     test('to get a 404 and sends an appropriate status and error message when given a valid but non-existent id',()=>{
         return request(app)
         .get('/api/articles/999')
@@ -96,6 +90,30 @@ describe('GET /api/articles/:article_id',()=>{
         .then((response)=>{
             expect(response.body.msg).toBe('Bad request')
         })
+    });
+
+
+});
+
+
+describe('GET /api/articles',()=>{
+    test('to get a 200 code from the get request',()=>{
+        return request(app)
+        .get('/api/articles')
+        //.expect(200)
+    })
+    
+    test('',()=>{
+       
+
+    })
+
+    test('',()=>{
+     
+    })
+
+    test('',()=>{
+
     });
 
 
