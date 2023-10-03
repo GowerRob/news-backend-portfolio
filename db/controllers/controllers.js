@@ -31,7 +31,6 @@ exports.getAllArticles = (req,res,next)=>{
     .then((articles)=>{
         res.status(200).send({articles:articles});
     }).catch((err)=>{
-        console.log("Bad", err)
         next(err)
     })
 

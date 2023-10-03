@@ -106,6 +106,7 @@ describe('GET /api/articles',()=>{
         return request(app)
         .get('/api/articles')
         .then((response)=>{
+            expect(response.body.articles.length).not.toBe(0);
             response.body.articles.forEach((article)=>{
                 expect(article).toMatchObject({
                     author: expect.any(String),
@@ -124,7 +125,6 @@ describe('GET /api/articles',()=>{
         return request(app)
         .get('/api/articles')
         .then((response)=>{
-            console.log(response.body.articles[0])
             expect(response.body.articles).toBeSortedBy('created_at',{descending:true})
         })
     })
