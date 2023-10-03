@@ -33,7 +33,12 @@ exports.fetchAllArticles=()=>{
     `
     return db.query(queryStr).
     then((response)=>{
-        console.log(response.rows)
-        return response.rows
+        if(response.rowCount===0){
+            return Promise.reject({status:404, msg:"Database has no articles in it currently"})
+        }else{
+            return response.rows
+        }
+        
+        
     })
 }

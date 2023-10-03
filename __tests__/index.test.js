@@ -100,7 +100,7 @@ describe('GET /api/articles',()=>{
     test('to get a 200 code from the get request',()=>{
         return request(app)
         .get('/api/articles')
-        //.expect(200)
+        .expect(200)
     })
     
     test('',()=>{
