@@ -9,7 +9,6 @@ exports.fetchTopics=()=>{
 }
 
 exports.fetchArticleById=(article_id)=>{
-    
     return db.query(`SELECT * from articles
         WHERE article_id = $1;`,[article_id])
         .then((results)=>{
@@ -44,7 +43,7 @@ exports.fetchCommentsByArticleId=(article_id)=>{
 }
 
 exports.fetchAllArticles=()=>{
-    const queryStr=`SELECT  articles.author,articles.title,
+    const queryStr=`SELECT articles.author,articles.title,
     articles.article_id,articles.topic,
     articles.created_at,articles.votes, 
     articles.article_img_url, COUNT(comments.comment_id) as comment_count
@@ -57,4 +56,20 @@ exports.fetchAllArticles=()=>{
     then((response)=>{
             return response.rows;
     })
+}
+
+exports.updateArticleById=(patchData,article_id)=>{
+    const queryStr=`
+    UPDATE articles
+    SET votes=votes + $1
+    WHERE article_id = $2 
+    RETURNING *;
+    `
+    const values=[patchData,article_id];
+    
+    return db.query(queryStr,values)
+    .then((response)=>{
+        return response.rows[0];
+    });
+
 }

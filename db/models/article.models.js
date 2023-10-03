@@ -1,6 +1,7 @@
 const db =require('../connection');
 
 exports.fetchArticleByIds = (article_id) =>{
+       console.log("Code 1111")
         return db.
         query("SELECT * FROM comments WHERE comment_id = $1", [article_id])
         .then((result)=>{

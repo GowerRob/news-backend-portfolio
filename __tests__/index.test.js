@@ -178,7 +178,7 @@ describe('GET /api/articles',()=>{
         .get('/api/articles/999/comments')
         .expect(404)
         .then((response)=>{
-            expect(response.body.msg).toBe('No article with that id');
+            expect(response.body.msg).toBe('Article does not exist');
         })
     });
 
@@ -193,4 +193,49 @@ describe('GET /api/articles',()=>{
 
 });
 
+describe('PATCH /api/articles/:article_id',()=>{
+    
+    test('when a valid positive patch is posted, returns a 201 code and an updated article object',()=>{
+        const patchData={inc_votes:7};
+
+        return request(app)
+        .patch('/api/articles/1')
+        .send(patchData)
+        .expect(201)
+        .then((response)=>{
+                expect(response.body.article).toMatchObject({
+                    article_id: 1,
+                    title: ('Living in the shadow of a great man'),
+                    topic: ('mitch'),
+                    author: ('butter_bridge'),
+                    created_at: expect.any(String),
+                    article_img_url: expect.any(String),
+                    votes: 107,
+                })
+        })
+    })
+
+    test('when a valid negative patch is posted, returns a 201 code and an updated article object',()=>{
+        const patchData={inc_votes:-50};
+
+        return request(app)
+        .patch('/api/articles/1')
+        .send(patchData)
+        .expect(201)
+        .then((response)=>{
+                expect(response.body.article).toMatchObject({
+                    article_id: 1,
+                    title: ('Living in the shadow of a great man'),
+                    topic: ('mitch'),
+                    author: ('butter_bridge'),
+                    created_at: expect.any(String),
+                    article_img_url: expect.any(String),
+                    votes: 50,
+                })
+        })
+    })
+  
+
+
+});
 
