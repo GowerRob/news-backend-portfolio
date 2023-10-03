@@ -133,6 +133,15 @@ describe('GET /api/articles',()=>{
 
 
 describe('POST /api/articles/:article_id/comments',()=>{
+    test('get a 201 code',()=>{
+        const newComment={body:"This is a really good article", username:"lurker"};
+        
+        return request(app)
+        .post('/api/articles/1/comments')
+        .send(newComment)
+        .expect(201)
+
+    })
     test('get a 201 code and the inserted comment when posting with a valid username and article id',()=>{
         const newComment=
         {body:"This is a really good article", 
@@ -149,8 +158,7 @@ describe('POST /api/articles/:article_id/comments',()=>{
             expect(response.body.comment.article_id).toBe(1)
         })
     })
-
-    test('get a 400 code and error message when posting to an article that does not exist',()=>{
+    test('get a 404 code and error message when posting to an article that does not exist (but could)-> 77',()=>{
         const newComment=
         {body:"This is a really good article", 
         username:"lurker"};
@@ -158,13 +166,24 @@ describe('POST /api/articles/:article_id/comments',()=>{
         return request(app)
         .post('/api/articles/77/comments')
         .send(newComment)
+        .expect(404)
+        .then((response)=>{
+            expect(response.body.msg).toBe('Bad request')
+        })
+    })
+    test('get a 400 code and error message when the article id is invalid (not possible id) -> cheese',()=>{
+        const newComment=
+        {body:"This is a really good article", username:"lurker"};
+    
+        return request(app)
+        .post('/api/articles/cheese/comments')
+        .send(newComment)
         .expect(400)
         .then((response)=>{
             expect(response.body.msg).toBe('Bad request')
         })
     })
-
-    test('get a 400 code and error message when posting to a valid article but as an invalid username',()=>{
+    test('get a 404 code and error message when posting to a valid article but as an invalid username',()=>{
         const newComment=
         {body:"This is a really good article", 
         username:"glasses2020"};
@@ -172,10 +191,9 @@ describe('POST /api/articles/:article_id/comments',()=>{
         return request(app)
         .post('/api/articles/1/comments')
         .send(newComment)
-        .expect(400)
+        .expect(404)
         .then((response)=>{
             expect(response.body.msg).toBe('Bad request')
         })
     })
-
 })
