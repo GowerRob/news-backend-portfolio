@@ -114,6 +114,7 @@ describe('GET /api/articles/:article_id/comments',()=>{
     test('expect an array of comments, sorted descending by date, when comments exist',()=>{
         return request(app)
         .get('/api/articles/1/comments')
+        .expect(200)
         .then((response)=>{
             expect(response.body.comments.length).not.toBe(0);
             response.body.comments.forEach((comment)=>{
