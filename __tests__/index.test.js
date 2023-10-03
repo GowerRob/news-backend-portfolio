@@ -143,7 +143,6 @@ describe('POST /api/articles/:article_id/comments',()=>{
         .send(newComment)
         .expect(201)
         .then((response)=>{
-            console.log(response.body.comment)
             expect(response.body.comment.body).toBe('This is a really good article')
             expect(response.body.comment.author).toBe('lurker')
             expect(response.body.comment.votes).toBe(0)
