@@ -194,10 +194,8 @@ describe('GET /api/articles',()=>{
 });
 
 describe('PATCH /api/articles/:article_id',()=>{
-    
     test('when a valid positive patch is posted, returns a 201 code and an updated article object',()=>{
         const patchData={inc_votes:7};
-
         return request(app)
         .patch('/api/articles/1')
         .send(patchData)
@@ -214,10 +212,8 @@ describe('PATCH /api/articles/:article_id',()=>{
                 })
         })
     })
-
     test('when a valid negative patch is posted, returns a 201 code and an updated article object',()=>{
         const patchData={inc_votes:-50};
-
         return request(app)
         .patch('/api/articles/1')
         .send(patchData)
@@ -234,8 +230,41 @@ describe('PATCH /api/articles/:article_id',()=>{
                 })
         })
     })
+
+    test('when an invalid patch is posted, returns a 400 and error message',()=>{
+        const patchData={inc_votes:"banana"};
+        return request(app)
+        .patch('/api/articles/1')
+        .send(patchData)
+        .expect(400)
+        .then((response)=>{
+               expect(response.body.msg).toBe('Bad request')
+        })
+    })
+
+    test('when an valid patch is posted to an article that doesnt exist eg. 88, returns a 404 and error message',()=>{
+        const patchData={inc_votes:200};
+        return request(app)
+        .patch('/api/articles/88')
+        .send(patchData)
+        .expect(404)
+        .then((response)=>{
+               expect(response.body.msg).toBe('Article does not exist')
+        })
+    })
+
+    test('when an valid patch is posted to an invalid article id eg. pen, returns a 404 and error message',()=>{
+        const patchData={inc_votes:200};
+
+        return request(app)
+        .patch('/api/articles/pen')
+        .send(patchData)
+        .expect(400)
+        .then((response)=>{
+               expect(response.body.msg).toBe('Bad request')
+        })
+    })
   
-
-
+  
 });
 
