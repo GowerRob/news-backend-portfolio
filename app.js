@@ -1,14 +1,18 @@
 const express = require('express');
+const {handlePSQLErrors,handleCustomErrors, handle500Errors} = require("./db/controllers/errorHandling.controllers")
 const { getTopics,
         getApi,
         getArticleById,
+        getCommentsByArticleId,
         getAllArticles} = require("./db/controllers/controllers");
 
 const app = express();
 
+
 app.get('/api/topics', getTopics);
 app.get('/api', getApi);
 app.get('/api/articles/:article_id',getArticleById)
+app.get('/api/articles/:article_id/comments',getCommentsByArticleId)
 app.get('/api/articles',getAllArticles)
 
 
@@ -18,24 +22,10 @@ app.all('/*',(req,res,next)=>{
 
 
 //Error Handing
-app.use((err,req,res,next)=>{
-    //An invalid request
-    if(err.code==="22P02"){
-      res.status(400).send({msg:'Bad request'})
-    }
-    next(err);
-  });
+app.use(handlePSQLErrors);
 
-app.use((err,req,res,next)=>{
-    if(err.status){
-        res.status(err.status).send({msg: err.msg});
-    }
-    next(err)
-})
+app.use(handleCustomErrors);
 
-
-app.use((err,req,res,next)=>{
-    res.status(500).send({msg:"internal server error"});
-})
+app.use(handle500Errors);
 
 module.exports = app;
