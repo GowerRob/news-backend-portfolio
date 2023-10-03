@@ -21,11 +21,10 @@ exports.fetchArticleById=(id)=>{
 }
 
 exports.fetchAllArticles=()=>{
-    console.log("Mod in")
     const queryStr=`SELECT  articles.author,articles.title,
     articles.article_id,articles.topic,
     articles.created_at,articles.votes, 
-    articles.article_img_url, COUNT(comments.comment_id)
+    articles.article_img_url, COUNT(comments.comment_id) as comment_count
     FROM articles
     JOIN comments On articles.article_id=comments.article_id
     GROUP BY articles.article_id

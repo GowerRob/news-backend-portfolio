@@ -102,19 +102,33 @@ describe('GET /api/articles',()=>{
         .get('/api/articles')
         .expect(200)
     })
-    
-    test('',()=>{
-       
-
+    test('expect an array of objects with the correct keys',()=>{
+        return request(app)
+        .get('/api/articles')
+        .then((response)=>{
+            response.body.articles.forEach((article)=>{
+                expect(article).toMatchObject({
+                    author: expect.any(String),
+                    article_id: expect.any(Number),
+                    title: expect.any(String),
+                    topic: expect.any(String),
+                    created_at: expect.any(String),
+                    article_img_url: expect.any(String),
+                    votes: expect.any(Number),
+                    comment_count: expect.any(String)
+                })
+            })
+        })
+    })
+    test('expect the articles to be ordered descending by created at',()=>{
+        return request(app)
+        .get('/api/articles')
+        .then((response)=>{
+            console.log(response.body.articles[0])
+            expect(response.body.articles).toBeSortedBy('created_at',{descending:true})
+        })
     })
 
-    test('',()=>{
-     
-    })
-
-    test('',()=>{
-
-    });
 
 
 });
