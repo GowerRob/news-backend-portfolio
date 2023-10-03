@@ -104,14 +104,22 @@ describe('GET /api/articles/:article_id',()=>{
 
 
 describe('GET /api/articles/:article_id/comments',()=>{
-    // test('to get a 200 code',()=>{
-    //     return request(app)
-    //     .get('/api/articles/2/comments')
-    //     .expect(200)
-    // })
+    test('to get a 200 code',()=>{
+        return request(app)
+        .get('/api/articles/1/comments')
+        .expect(200)
+    })
 
 
-    test('',()=>{
+    test('expect an array of comments, sorted descending by date, when comments exist',()=>{
+        return request(app)
+        .get('/api/articles/1/comments')
+        .then((response)=>{
+
+            
+
+        })
+        
 
     })
 
