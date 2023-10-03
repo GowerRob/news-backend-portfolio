@@ -82,6 +82,13 @@
       }
         ]
     }
+  },
+
+  "DELETE /api/comments/:comment_id":
+  {
+    "description":"deletes a comment using the given comment id. note no content is returned",
+    "queries":[],
+    "exampleResponse":null
   }
 
 }
