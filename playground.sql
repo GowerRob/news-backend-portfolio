@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 \c  nc_news_test
 
 SELECT  articles.author,articles.title,
@@ -20,3 +21,6 @@ WHERE article_id =1
 ORDER BY created_at DESC;
 
 
+=======
+/c PGDATABASE=nc_news_test
+>>>>>>> main
