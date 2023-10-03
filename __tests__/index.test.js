@@ -99,4 +99,29 @@ describe('GET /api/articles/:article_id',()=>{
     });
 
 
-});
+})
+
+
+
+describe('GET /api/articles/:article_id/comments',()=>{
+    // test('to get a 200 code',()=>{
+    //     return request(app)
+    //     .get('/api/articles/2/comments')
+    //     .expect(200)
+    // })
+
+
+    test('',()=>{
+
+    })
+
+
+    test('to get a 404 and sends an appropriate status and error message when given a valid but non-existent id',()=>{
+
+    })
+    test('to get a 400 and sends an appropriate status and error message when given an invalid code',()=>{
+
+    });
+
+
+})
