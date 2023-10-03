@@ -35,3 +35,18 @@ exports.fetchAllArticles=()=>{
             return response.rows;
     })
 }
+
+exports.insertComment=(newComment,article_id)=>{
+    const values=[newComment.body,article_id,newComment.username];
+    const queryStr=`
+    INSERT INTO comments
+    (body, article_id, author)
+    VALUES ($1, $2, $3)
+    RETURNING *;
+    `;
+    return db.query(queryStr,values)
+    .then((response)=>{
+        return response.rows[0]
+    })
+
+}

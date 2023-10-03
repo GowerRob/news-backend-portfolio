@@ -129,6 +129,54 @@ describe('GET /api/articles',()=>{
         })
     })
 
-
-
 });
+
+
+describe('POST /api/articles/:article_id/comments',()=>{
+    test('get a 201 code and the inserted comment when posting with a valid username and article id',()=>{
+        const newComment=
+        {body:"This is a really good article", 
+        username:"lurker"};
+        
+        return request(app)
+        .post('/api/articles/1/comments')
+        .send(newComment)
+        .expect(201)
+        .then((response)=>{
+            console.log(response.body.comment)
+            expect(response.body.comment.body).toBe('This is a really good article')
+            expect(response.body.comment.author).toBe('lurker')
+            expect(response.body.comment.votes).toBe(0)
+            expect(response.body.comment.article_id).toBe(1)
+        })
+    })
+
+    test('get a 400 code and error message when posting to an article that does not exist',()=>{
+        const newComment=
+        {body:"This is a really good article", 
+        username:"lurker"};
+        
+        return request(app)
+        .post('/api/articles/77/comments')
+        .send(newComment)
+        .expect(400)
+        .then((response)=>{
+            expect(response.body.msg).toBe('Bad request')
+        })
+    })
+
+    test('get a 400 code and error message when posting to a valid article but as an invalid username',()=>{
+        const newComment=
+        {body:"This is a really good article", 
+        username:"glasses2020"};
+        
+        return request(app)
+        .post('/api/articles/1/comments')
+        .send(newComment)
+        .expect(400)
+        .then((response)=>{
+            expect(response.body.msg).toBe('Bad request')
+        })
+    })
+
+})

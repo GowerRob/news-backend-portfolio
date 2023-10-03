@@ -1,4 +1,5 @@
-const { fetchTopics ,fetchArticleById, fetchAllArticles} = require("../models/models");
+const { fetchTopics ,fetchArticleById, fetchAllArticles,insertComment} = require("../models/models");
+const {fetchArticleByIds} = require('../models/article.models')
 const {readFile}=require('fs/promises');
 exports.getTopics = (req,res,next)=>{
     fetchTopics().then((topics)=>{
@@ -33,6 +34,23 @@ exports.getAllArticles = (req,res,next)=>{
     }).catch((err)=>{
         next(err)
     })
+}
+
+exports.postCommentByArticleId = (req,res,next)=>{
+    const newComment=req.body;
+    const {article_id}=req.params;
+ 
+    const promises=[insertComment(newComment,article_id),fetchArticleByIds(article_id)];
+    Promise.all(promises)
+    .then(([comment,articleData])=>{
+        res.status(201).send({comment:comment});
+    })
+    .catch((err)=>{
+        console.log(err)
+            next(err);
+        });
+
+
 
 
 }
