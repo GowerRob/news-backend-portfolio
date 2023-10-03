@@ -1,4 +1,4 @@
-const { fetchTopics ,fetchArticleById} = require("../models/models");
+const { fetchTopics ,fetchArticleById, fetchAllArticles} = require("../models/models");
 const {readFile}=require('fs/promises');
 exports.getTopics = (req,res,next)=>{
     fetchTopics().then((topics)=>{
@@ -24,5 +24,15 @@ exports.getArticleById = (req, res,next)=>{
     }).catch((err)=>{
         next(err)
     })
+}
+
+exports.getAllArticles = (req,res,next)=>{
+    fetchAllArticles()
+    .then((articles)=>{
+        res.status(200).send({articles:articles});
+    }).catch((err)=>{
+        next(err)
+    })
+
 
 }
