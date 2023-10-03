@@ -111,31 +111,54 @@ describe('GET /api/articles/:article_id/comments',()=>{
     })
 
 
-    // test('expect an array of comments, sorted descending by date, when comments exist',()=>{
-    //     return request(app)
-    //     .get('/api/articles/1/comments')
-    //     .then((response)=>{
-    //         response.body.comments.forEach((comment)=>{
-    //             expect(comment).toMatchObject({
-    //                 comment_id: expect.any(Number),
-    //                 votes: expect.any(Number),
-    //                 created_at: expect.any(String),
-    //                 author: expect.any(String),
-    //                 body: expect.any(String),
-    //                 article_id: expect.any(Number),
-    //             })
-    //         })
-    //         expect(response.body.comments).toBeSortedBy('created_at',{descending:true})   ; 
-    //     })
-    // })
-
-
-    test('to get a 404 and sends an appropriate status and error message when given a valid but non-existent id',()=>{
-
+    test('expect an array of comments, sorted descending by date, when comments exist',()=>{
+        return request(app)
+        .get('/api/articles/1/comments')
+        .then((response)=>{
+            expect(response.body.comments.length).not.toBe(0);
+            response.body.comments.forEach((comment)=>{
+                expect(comment).toMatchObject({
+                    comment_id: expect.any(Number),
+                    votes: expect.any(Number),
+                    created_at: expect.any(String),
+                    author: expect.any(String),
+                    body: expect.any(String),
+                    article_id: expect.any(Number),
+                })
+            })
+            expect(response.body.comments).toBeSortedBy('created_at',{descending:true})   ; 
+        })
     })
-    test('to get a 400 and sends an appropriate status and error message when given an invalid code',()=>{
 
+
+    test('expect a 200 when an id that exists but no comments are related to it',()=>{
+        return request(app)
+        .get('/api/articles/2/comments')
+        .expect(200)
+        .then((response)=>{
+            expect(response.body.comments.length).toBe(0);
+        })
+    })
+
+    test('to get a 404 and sends an appropriate status and error message when given a valid code that does not exist',()=>{
+        return request(app)
+        .get('/api/articles/999/comments')
+        .expect(404)
+        .then((response)=>{
+            expect(response.body.msg).toBe('No article with that id');
+        })
     });
+
+    test('to get a 400 and sends an appropriate status and error message when given an invalid',()=>{
+        return request(app)
+        .get('/api/articles/apples/comments')
+        .expect(400)
+        .then((response)=>{
+            expect(response.body.msg).toBe('Bad request');
+        })
+    });
+
+
 
 
 })

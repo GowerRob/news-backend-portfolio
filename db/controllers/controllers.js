@@ -1,7 +1,11 @@
 const { fetchTopics ,
         fetchArticleById,
         fetchCommentsByArticleId} = require("../models/models");
+
+const {fetchArticleByIds} = require("../models/article.models")
+
 const {readFile}=require('fs/promises');
+
 exports.getTopics = (req,res,next)=>{
     fetchTopics().then((topics)=>{
         res.status(200).send({topics:topics});
@@ -29,10 +33,11 @@ exports.getArticleById = (req, res,next)=>{
 }
 
 exports.getCommentsByArticleId = (req, res, next)=>{
-    console.log("In control")
     const {article_id}=req.params;
-    fetchCommentsByArticleId(article_id)
-    .then((comments)=>{
+
+    const promises=[fetchCommentsByArticleId(article_id),fetchArticleByIds(article_id)]
+    Promise.all(promises)
+    .then(([comments,articleDetails])=>{
         res.status(200).send({comments:comments});
     }).catch((err)=>{
         next(err)

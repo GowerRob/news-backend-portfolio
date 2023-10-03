@@ -23,7 +23,6 @@ exports.fetchArticleById=(article_id)=>{
 
 
 exports.fetchCommentsByArticleId=(article_id)=>{
-    console.log("In model")
     const queryStr=`SELECT  comment_id,votes,
         created_at, author, 
         body,article_id
@@ -33,14 +32,9 @@ exports.fetchCommentsByArticleId=(article_id)=>{
 
     return db.query(queryStr,[article_id])
     .then((results)=>{
-        console.log(results.rows)
-        if(results.rows.length===0){
-            console.log("Out model 1")
-            return Promise.reject({status:404, msg:"No comments for this article"})
-          }else{
-            console.log("Out model 2")
+
             return results.rows;
-          }
+          
 
     })
 
