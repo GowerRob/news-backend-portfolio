@@ -194,6 +194,30 @@ describe('GET /api/articles',()=>{
 });
 
 
+describe('GET /api/articles/:article_id (comment_count)',()=>{
+    test('return article when count non 0',()=>{
+        return request(app)
+        .get('/api/articles/1')
+        .expect(200)
+        .then((response)=>{
+            expect(response.body.article.comment_count).toBe(11)
+        })
+    })
+   
+   
+    test('return article when count is 0',()=>{
+        return request(app)
+        .get('/api/articles/2')
+        .expect(200)
+        .then((response)=>{
+            expect(response.body.article.comment_count).toBe(0)
+
+        })
+    })
+
+})
+
+
 describe('GET /api/users',()=>{
     test('get a 200 reponse when making a get request',()=>{
         return request(app)
