@@ -142,7 +142,7 @@ describe('POST /api/articles/:article_id/comments',()=>{
         .expect(201)
 
     })
-    test('get a 201 code and the inserted comment when posting with a valid username and article id',()=>{
+    test('get a 201 code and the inserted comment returned when posting with a valid username and article id',()=>{
         const newComment=
         {body:"This is a really good article", 
         username:"lurker"};
@@ -158,6 +158,29 @@ describe('POST /api/articles/:article_id/comments',()=>{
             expect(response.body.comment.article_id).toBe(1)
         })
     })
+
+    test('get a 201 code and the inserted comment returned when posting with a valid username and article id, but also unnecessary properties',()=>{
+        const newComment=
+        {body:"This is a really good article", 
+        username:"lurker",
+        hairColour:"Yes"};
+        
+        return request(app)
+        .post('/api/articles/1/comments')
+        .send(newComment)
+        .expect(201)
+        .then((response)=>{
+            expect(response.body.comment.body).toBe('This is a really good article')
+            expect(response.body.comment.author).toBe('lurker')
+            expect(response.body.comment.votes).toBe(0)
+            expect(response.body.comment.article_id).toBe(1)
+            expect(response.body.comment.hasOwnProperty('hairColour')).toBe(false);
+        })
+    })
+
+
+
+
     test('get a 404 code and error message when posting to an article that does not exist (but could)-> 77',()=>{
         const newComment=
         {body:"This is a really good article", 
