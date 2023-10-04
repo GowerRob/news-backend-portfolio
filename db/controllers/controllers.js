@@ -1,7 +1,8 @@
 const { fetchTopics ,
         fetchArticleById,
         fetchCommentsByArticleId,
-        fetchAllArticles} = require("../models/models");
+        fetchAllArticles,
+        fetchAllUsers} = require("../models/models");
 
 const {fetchArticleByIds} = require("../models/article.models")
 
@@ -49,9 +50,19 @@ exports.getAllArticles = (req,res,next)=>{
     fetchAllArticles()
     .then((articles)=>{
         res.status(200).send({articles:articles});
-    }).catch((err)=>{
+    })
+    .catch((err)=>{
         next(err)
     })
 }
 
+exports.getUsers = (req,res,next)=>{
+    fetchAllUsers()
+    .then((users)=>{
+        res.status(200).send({users:users});
+    })
+    .catch((err)=>{
+        next(err)
+    })
 
+}

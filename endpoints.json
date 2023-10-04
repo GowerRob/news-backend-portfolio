@@ -82,6 +82,20 @@
       }
         ]
     }
+  },
+
+  "GET /api/users":{
+    "desciprtion":"serves all the users rows",
+    "queries":[],
+    "exampleResponse":[
+      {"username":"rogersop",
+    "name":"paul",
+    "avatar_url":"https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png"},
+    {"username":"icellusedkars",
+    "name":"sam",
+    "avatar_url":"https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png"}  
+  ]
+
   }
 
 }

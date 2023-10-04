@@ -194,3 +194,27 @@ describe('GET /api/articles',()=>{
 });
 
 
+describe('GET /api/users',()=>{
+    test('get a 200 reponse when making a get request',()=>{
+        return request(app)
+        .get('/api/users')
+        .expect(200)
+    })
+
+    test('should return an array of all users with correct properties',()=>{
+        return request(app)
+        .get('/api/users')
+        .expect(200)
+        .then((response)=>{
+            expect(response.body.users.length).toBe(4);
+            response.body.users.forEach((user)=>{
+                expect(user).toMatchObject({
+                    username: expect.any(String),
+                    name: expect.any(String),
+                    avatar_url: expect.any(String),
+                })
+            })
+        })
+    })
+
+})

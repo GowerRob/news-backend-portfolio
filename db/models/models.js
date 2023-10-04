@@ -53,8 +53,17 @@ exports.fetchAllArticles=()=>{
     GROUP BY articles.article_id
     ORDER BY created_at DESC;
     `
-    return db.query(queryStr).
-    then((response)=>{
+    return db.query(queryStr)
+    .then((response)=>{
             return response.rows;
     })
+}
+
+exports.fetchAllUsers=()=>{
+return db.query(`SELECT  * FROM users;`)
+.then((response)=>{
+    return response.rows;
+})
+
+
 }
