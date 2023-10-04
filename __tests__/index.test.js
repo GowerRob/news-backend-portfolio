@@ -253,7 +253,7 @@ describe('PATCH /api/articles/:article_id',()=>{
         })
     })
 
-    test('when an valid patch is posted to an invalid article id eg. pen, returns a 404 and error message',()=>{
+    test('when an valid patch is posted to an invalid article id eg. pen, returns a 400 and error message',()=>{
         const patchData={inc_votes:200};
 
         return request(app)

@@ -66,10 +66,15 @@ exports.updateArticleById=(patchData,article_id)=>{
     RETURNING *;
     `
     const values=[patchData,article_id];
-    
     return db.query(queryStr,values)
     .then((response)=>{
-        return response.rows[0];
+        if (response.rowCount === 0){
+            
+            return Promise.reject({status: 404, msg: 'Article does not exist'})
+        }   
+        else {
+            return response.rows[0] 
+        }
     });
 
 }

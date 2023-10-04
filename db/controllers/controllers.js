@@ -4,7 +4,7 @@ const { fetchTopics ,
         fetchAllArticles,
         updateArticleById} = require("../models/models");
 
-//const {fetchArticleByIds} = require("../models/article.models")
+
 const {readFile}=require('fs/promises');
 const { articleData } = require("../data/test-data");
 
@@ -40,7 +40,7 @@ exports.getCommentsByArticleId = (req, res, next)=>{
 
     const promises=[fetchCommentsByArticleId(article_id),fetchArticleById(article_id)]
     Promise.all(promises)
-    .then(([comments,articleData])=>{
+    .then(([comments])=>{
         res.status(200).send({comments:comments});
     }).catch((err)=>{
         next(err)
@@ -57,11 +57,11 @@ exports.getAllArticles = (req,res,next)=>{
 
 
 exports.patchArticleById =(req,res,next)=>{
+    
     const patchData=req.body;
     const {article_id}=req.params;
-    const promises=[updateArticleById(patchData.inc_votes,article_id),fetchArticleById(article_id)];
-    Promise.all(promises)
-    .then(([article,articleData])=>{
+    updateArticleById(patchData.inc_votes,article_id)
+    .then((article)=>{
         res.status(201).send({article:article});
     }).catch((err)=>{
         next(err)
