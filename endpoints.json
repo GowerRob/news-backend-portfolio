@@ -84,6 +84,13 @@
         ]
     }
   },
+
+  "DELETE /api/comments/:comment_id":
+  {
+    "description":"deletes a comment using the given comment id. note no content is returned",
+    "queries":[],
+    "exampleResponse":null
+  },
   "POST /api/articles/:article_id/comments":{
     "description": "post a comment to comments given a body, username and article_id in the endpoint",
     "queries": [],

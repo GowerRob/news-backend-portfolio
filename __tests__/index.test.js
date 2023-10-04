@@ -288,6 +288,34 @@ describe('POST /api/articles/:article_id/comments',()=>{
 
 });
 
+describe('DELETE /api/comments/:comment_id',()=>{
+    test('returns a 204 and no content',()=>{
+        return request(app)
+        .delete('/api/comments/3')
+        .expect(204)
+    })
+
+    test('Returns a 404 and message when an id that does not exist is provided eg. 99',()=>{
+        return request(app)
+        .delete('/api/comments/99')
+        .expect(404)
+        .then((response)=>{
+            expect(response.body.msg).toBe('No comment with that id')
+        })
+    })
+
+    test('Returns a 400 and message when an id that does not exist is provided eg. mouse',()=>{
+        return request(app)
+        .delete('/api/comments/mouse')
+        .expect(400)
+        .then((response)=>{
+            expect(response.body.msg).toBe('Bad request')
+        })
+    })
+
+
+})
+
 
 describe('GET /api/articles/:article_id (comment_count)',()=>{
     test('return article when count non 0',()=>{

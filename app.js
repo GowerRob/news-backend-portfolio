@@ -5,6 +5,7 @@ const { getTopics,
         getArticleById,
         getCommentsByArticleId,
         getAllArticles,
+        deleteCommentById,
         getUsers,
         postCommentByArticleId} = require("./db/controllers/controllers");
 
@@ -18,6 +19,8 @@ app.get('/api/articles/:article_id',getArticleById)
 app.get('/api/articles/:article_id/comments',getCommentsByArticleId)
 app.get('/api/articles',getAllArticles)
 app.post('/api/articles/:article_id/comments', postCommentByArticleId)
+
+app.delete('/api/comments/:comment_id', deleteCommentById)
 
 app.get('/api/users',getUsers)
 

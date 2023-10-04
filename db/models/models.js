@@ -67,6 +67,17 @@ exports.fetchAllArticles=()=>{
     })
 }
 
+exports.removeCommentById=(comment_id)=>{
+    return db.query(`
+    DELETE FROM comments
+    WHERE comment_id = $1
+    ;`,[comment_id])
+    .then((results)=>{
+        if(results.rowCount===0){
+            return Promise.reject({status:404, msg:'No comment with that id'})
+          }
+    })
+}
 exports.insertComment=(newComment,article_id)=>{
     const values=[newComment.body,article_id,newComment.username];
     const queryStr=`

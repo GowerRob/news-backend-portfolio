@@ -2,6 +2,7 @@ const { fetchTopics ,
         fetchArticleById,
         fetchCommentsByArticleId,
         fetchAllArticles,
+        removeCommentById,
         fetchAllUsers,
         insertComment} = require("../models/models");
 
@@ -26,7 +27,6 @@ exports.getApi = (req,res)=>{
 }
 
 exports.getArticleById = (req, res,next)=>{
-    
     const {article_id}=req.params
     fetchArticleById(article_id)
     .then((article)=>{
@@ -57,6 +57,16 @@ exports.getAllArticles = (req,res,next)=>{
     })
 }
 
+exports.deleteCommentById = (req, res,next)=>{
+    const {comment_id}=req.params;
+    removeCommentById(comment_id)
+    .then(()=>{
+        res.status(204).send();
+    })
+    .catch((err)=>{
+        next(err);
+      });
+}
 exports.getUsers = (req,res,next)=>{
     fetchAllUsers()
     .then((users)=>{
