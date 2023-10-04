@@ -95,8 +95,6 @@ describe('GET /api/articles/:article_id',()=>{
 
 })
 
-
-
 describe('GET /api/articles/:article_id/comments',()=>{
         test('to get a 200 code',()=>{
             return request(app)
