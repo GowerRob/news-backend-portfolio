@@ -1,50 +1,35 @@
 const express = require('express');
+const {handlePSQLErrors,handleCustomErrors, handle500Errors} = require("./db/controllers/errorHandling.controllers")
 const { getTopics,
         getApi,
         getArticleById,
+        getCommentsByArticleId,
         getAllArticles,
+        getUsers,
         postCommentByArticleId} = require("./db/controllers/controllers");
 
 const app = express();
 app.use(express.json());
 
+
 app.get('/api/topics', getTopics);
 app.get('/api', getApi);
 app.get('/api/articles/:article_id',getArticleById)
+app.get('/api/articles/:article_id/comments',getCommentsByArticleId)
 app.get('/api/articles',getAllArticles)
 app.post('/api/articles/:article_id/comments', postCommentByArticleId)
+
+app.get('/api/users',getUsers)
 
 app.all('/*',(req,res,next)=>{
     res.status(404).send({msg:"bad request"})
 })
 
-
 //Error Handing
-app.use((err,req,res,next)=>{
-    //An invalid request
-    if(err.code==="22P02"||err.code==="23502"){
-      res.status(400).send({msg:'Bad request'})
-    }
-    else if(err.code==="23503"){
-        res.status(404).send({msg:'Bad request'})
-    }else{
-       next(err); 
-    }
-    
-  });
+app.use(handlePSQLErrors);
 
-app.use((err,req,res,next)=>{
-    if(err.status){
-        res.status(err.status).send({msg: err.msg});
-    }else{
-       next(err) 
-    }
-    
-})
+app.use(handleCustomErrors);
 
-
-app.use((err,req,res,next)=>{
-    res.status(500).send({msg:"internal server error"});
-})
+app.use(handle500Errors);
 
 module.exports = app;

@@ -1,6 +1,14 @@
-const { fetchTopics ,fetchArticleById, fetchAllArticles,insertComment} = require("../models/models");
-const {fetchArticleByIds} = require('../models/article.models')
+const { fetchTopics ,
+        fetchArticleById,
+        fetchCommentsByArticleId,
+        fetchAllArticles,
+        fetchAllUsers,
+        insertComment} = require("../models/models");
+
+const {fetchArticleByIds} = require("../models/article.models")
+
 const {readFile}=require('fs/promises');
+
 exports.getTopics = (req,res,next)=>{
     fetchTopics().then((topics)=>{
         res.status(200).send({topics:topics});
@@ -18,6 +26,7 @@ exports.getApi = (req,res)=>{
 }
 
 exports.getArticleById = (req, res,next)=>{
+    
     const {article_id}=req.params
     fetchArticleById(article_id)
     .then((article)=>{
@@ -27,11 +36,33 @@ exports.getArticleById = (req, res,next)=>{
     })
 }
 
+exports.getCommentsByArticleId = (req, res, next)=>{
+    const {article_id}=req.params;
+
+    const promises=[fetchCommentsByArticleId(article_id),fetchArticleByIds(article_id)]
+    Promise.all(promises)
+    .then(([comments,articleDetails])=>{
+        res.status(200).send({comments:comments});
+    }).catch((err)=>{
+        next(err)
+    })
+}
 exports.getAllArticles = (req,res,next)=>{
     fetchAllArticles()
     .then((articles)=>{
         res.status(200).send({articles:articles});
-    }).catch((err)=>{
+    })
+    .catch((err)=>{
+        next(err)
+    })
+}
+
+exports.getUsers = (req,res,next)=>{
+    fetchAllUsers()
+    .then((users)=>{
+        res.status(200).send({users:users});
+    })
+    .catch((err)=>{
         next(err)
     })
 }
@@ -40,14 +71,14 @@ exports.postCommentByArticleId = (req,res,next)=>{
     const newComment=req.body;
     const {article_id}=req.params;
  
-    const promises=[insertComment(newComment,article_id),fetchArticleByIds(article_id)];
+    const promises=[insertComment(newComment,article_id),fetchArticleById(article_id)];
     Promise.all(promises)
     .then(([comment,articleData])=>{
         res.status(201).send({comment:comment});
     })
     .catch((err)=>{
-        console.log(err)
             next(err);
         });
 
 }
+
