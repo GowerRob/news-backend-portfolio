@@ -2,7 +2,9 @@ const { fetchTopics ,
         fetchArticleById,
         fetchCommentsByArticleId,
         fetchAllArticles,
-        removeCommentById} = require("../models/models");
+        removeCommentById,
+        fetchAllUsers,
+        insertComment} = require("../models/models");
 
 const {fetchArticleByIds} = require("../models/article.models")
 
@@ -49,7 +51,8 @@ exports.getAllArticles = (req,res,next)=>{
     fetchAllArticles()
     .then((articles)=>{
         res.status(200).send({articles:articles});
-    }).catch((err)=>{
+    })
+    .catch((err)=>{
         next(err)
     })
 }
@@ -63,6 +66,29 @@ exports.deleteCommentById = (req, res,next)=>{
     .catch((err)=>{
         next(err);
       });
+}
+exports.getUsers = (req,res,next)=>{
+    fetchAllUsers()
+    .then((users)=>{
+        res.status(200).send({users:users});
+    })
+    .catch((err)=>{
+        next(err)
+    })
+}
+
+exports.postCommentByArticleId = (req,res,next)=>{
+    const newComment=req.body;
+    const {article_id}=req.params;
+ 
+    const promises=[insertComment(newComment,article_id),fetchArticleById(article_id)];
+    Promise.all(promises)
+    .then(([comment,articleData])=>{
+        res.status(201).send({comment:comment});
+    })
+    .catch((err)=>{
+            next(err);
+        });
 
 }
 

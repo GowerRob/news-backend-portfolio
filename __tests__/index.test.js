@@ -95,8 +95,6 @@ describe('GET /api/articles/:article_id',()=>{
 
 })
 
-
-
 describe('GET /api/articles/:article_id/comments',()=>{
         test('to get a 200 code',()=>{
             return request(app)
@@ -163,6 +161,7 @@ describe('GET /api/articles',()=>{
         })
     })
 
+});
 
     test('expect a 200 when an id that exists but no comments are related to it',()=>{
         return request(app)
@@ -170,6 +169,102 @@ describe('GET /api/articles',()=>{
         .expect(200)
         .then((response)=>{
             expect(response.body.comments.length).toBe(0);
+        })
+    })
+
+describe('POST /api/articles/:article_id/comments',()=>{
+    test('get a 201 code',()=>{
+        const newComment={body:"This is a really good article", username:"lurker"};
+        
+        return request(app)
+        .post('/api/articles/1/comments')
+        .send(newComment)
+        .expect(201)
+
+    })
+    test('get a 201 code and the inserted comment returned when posting with a valid username and article id',()=>{
+        const newComment=
+        {body:"This is a really good article", 
+        username:"lurker"};
+        return request(app)
+        .post('/api/articles/1/comments')
+        .send(newComment)
+        .expect(201)
+        .then((response)=>{
+            expect(response.body.comment.body).toBe('This is a really good article')
+            expect(response.body.comment.author).toBe('lurker')
+            expect(response.body.comment.votes).toBe(0)
+            expect(response.body.comment.article_id).toBe(1)
+        })
+    })
+
+    test('get a 201 code and the inserted comment returned when posting with a valid username and article id, but also unnecessary properties',()=>{
+        const newComment=
+        {body:"This is a really good article", 
+        username:"lurker",
+        hairColour:"Yes"};
+        
+        return request(app)
+        .post('/api/articles/1/comments')
+        .send(newComment)
+        .expect(201)
+        .then((response)=>{
+            expect(response.body.comment.body).toBe('This is a really good article')
+            expect(response.body.comment.author).toBe('lurker')
+            expect(response.body.comment.votes).toBe(0)
+            expect(response.body.comment.article_id).toBe(1)
+            expect(response.body.comment.hasOwnProperty('hairColour')).toBe(false);
+        })
+    })
+
+    test('get a 400 code when trying to insert a comment with missing property',()=>{
+        const newComment=
+        {body:"This is a really good article"};
+        return request(app)
+        .post('/api/articles/1/comments')
+        .send(newComment)
+        .expect(400)
+        .then((response)=>{
+            expect(response.body.msg).toBe('Bad request')
+        })
+    })
+
+    test('get a 404 code and error message when posting to an article that does not exist (but could)-> 77',()=>{
+        const newComment=
+        {body:"This is a really good article", 
+        username:"lurker"};
+        
+        return request(app)
+        .post('/api/articles/77/comments')
+        .send(newComment)
+        .expect(404)
+        .then((response)=>{
+            expect(response.body.msg).toBe('Bad request')
+        })
+    })
+    test('get a 400 code and error message when the article id is invalid (not possible id) -> cheese',()=>{
+        const newComment=
+        {body:"This is a really good article", username:"lurker"};
+    
+        return request(app)
+        .post('/api/articles/cheese/comments')
+        .send(newComment)
+        .expect(400)
+        .then((response)=>{
+            expect(response.body.msg).toBe('Bad request')
+        })
+    })
+    test('get a 404 code and error message when posting to a valid article but as an invalid username',()=>{
+        const newComment=
+        {body:"This is a really good article", 
+        username:"glasses2020"};
+        
+        return request(app)
+        .post('/api/articles/1/comments')
+        .send(newComment)
+        .expect(404)
+        .then((response)=>{
+            expect(response.body.msg).toBe('Bad request')
         })
     })
 
@@ -222,3 +317,51 @@ describe('DELETE /api/comments/:comment_id',()=>{
 })
 
 
+describe('GET /api/articles/:article_id (comment_count)',()=>{
+    test('return article when count non 0',()=>{
+        return request(app)
+        .get('/api/articles/1')
+        .expect(200)
+        .then((response)=>{
+            expect(response.body.article.comment_count).toBe(11)
+        })
+    })
+   
+   
+    test('return article when count is 0',()=>{
+        return request(app)
+        .get('/api/articles/2')
+        .expect(200)
+        .then((response)=>{
+            expect(response.body.article.comment_count).toBe(0)
+
+        })
+    })
+
+})
+
+
+describe('GET /api/users',()=>{
+    test('get a 200 reponse when making a get request',()=>{
+        return request(app)
+        .get('/api/users')
+        .expect(200)
+    })
+
+    test('should return an array of all users with correct properties',()=>{
+        return request(app)
+        .get('/api/users')
+        .expect(200)
+        .then((response)=>{
+            expect(response.body.users.length).toBe(4);
+            response.body.users.forEach((user)=>{
+                expect(user).toMatchObject({
+                    username: expect.any(String),
+                    name: expect.any(String),
+                    avatar_url: expect.any(String),
+                })
+            })
+        })
+    })
+
+})

@@ -10,8 +10,16 @@ exports.fetchTopics=()=>{
 
 exports.fetchArticleById=(article_id)=>{
     
-    return db.query(`SELECT * from articles
-        WHERE article_id = $1;`,[article_id])
+    return db.query(`
+    SELECT articles.author,articles.title,
+    articles.article_id, articles.body,
+    articles.topic, articles.created_at,
+    articles.votes, articles.article_img_url,
+    CAST(COUNT(comments.article_id) as INTEGER) as comment_count 
+    FROM articles
+    LEFT JOIN comments ON articles.article_id=comments.article_id
+    WHERE articles.article_id = $1
+    GROUP BY articles.article_id;`,[article_id])
         .then((results)=>{
             
             if(results.rows.length===0){
@@ -53,8 +61,8 @@ exports.fetchAllArticles=()=>{
     GROUP BY articles.article_id
     ORDER BY created_at DESC;
     `
-    return db.query(queryStr).
-    then((response)=>{
+    return db.query(queryStr)
+    .then((response)=>{
             return response.rows;
     })
 }
@@ -69,6 +77,27 @@ exports.removeCommentById=(comment_id)=>{
             return Promise.reject({status:404, msg:'No comment with that id'})
           }
     })
+}
+exports.insertComment=(newComment,article_id)=>{
+    const values=[newComment.body,article_id,newComment.username];
+    const queryStr=`
+    INSERT INTO comments
+    (body, article_id, author)
+    VALUES ($1, $2, $3)
+    RETURNING *;
+    `;
+    return db.query(queryStr,values)
+    .then((response)=>{
+        return response.rows[0]
+    })
+}
+
+
+exports.fetchAllUsers=()=>{
+return db.query(`SELECT  * FROM users;`)
+.then((response)=>{
+    return response.rows;
+})
 
 
 }
