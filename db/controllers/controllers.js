@@ -50,12 +50,8 @@ exports.getCommentsByArticleId = (req, res, next)=>{
 }
 exports.getAllArticles = (req,res,next)=>{
    const {topic}=req.query
-
-    const promises=[fetchAllArticles(topic)]
-    //if(topic){ promises.push(fetchTopicsBySlug(topic))}
-
-    Promise.all(promises)
-    .then(([articles])=>{
+    fetchAllArticles(topic)
+    .then((articles)=>{
         res.status(200).send({articles:articles});
     })
     .catch((err)=>{
