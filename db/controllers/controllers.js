@@ -4,6 +4,7 @@ const { fetchTopics ,
         fetchAllArticles} = require("../models/models");
 
 const {fetchArticleByIds} = require("../models/article.models")
+const {fetchTopicsBySlug} = require("../models/topics.models")
 
 const {readFile}=require('fs/promises');
 
@@ -46,8 +47,13 @@ exports.getCommentsByArticleId = (req, res, next)=>{
     })
 }
 exports.getAllArticles = (req,res,next)=>{
-    fetchAllArticles()
-    .then((articles)=>{
+   const {topic}=req.query
+
+    const promises=[fetchAllArticles(topic)]
+    if(topic){ promises.push(fetchTopicsBySlug(topic))}
+
+    Promise.all(promises)
+    .then(([articles,topicData])=>{
         res.status(200).send({articles:articles});
     }).catch((err)=>{
         next(err)
