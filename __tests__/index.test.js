@@ -194,7 +194,7 @@ describe('GET /api/articles',()=>{
 });
 
 
-describe.only('GET /apri/articles (topic query',()=>{
+describe('GET /apri/articles (topic query',()=>{
     test('return a 200 code when a request is made to the api',()=>{
         return request(app)
         .get('/api/articles?topic=mitch')
