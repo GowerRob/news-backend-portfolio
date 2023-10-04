@@ -2,7 +2,8 @@ const { fetchTopics ,
         fetchArticleById,
         fetchCommentsByArticleId,
         fetchAllArticles,
-        fetchAllUsers} = require("../models/models");
+        fetchAllUsers,
+        insertComment} = require("../models/models");
 
 const {fetchArticleByIds} = require("../models/article.models")
 
@@ -64,5 +65,20 @@ exports.getUsers = (req,res,next)=>{
     .catch((err)=>{
         next(err)
     })
+}
+
+exports.postCommentByArticleId = (req,res,next)=>{
+    const newComment=req.body;
+    const {article_id}=req.params;
+ 
+    const promises=[insertComment(newComment,article_id),fetchArticleById(article_id)];
+    Promise.all(promises)
+    .then(([comment,articleData])=>{
+        res.status(201).send({comment:comment});
+    })
+    .catch((err)=>{
+            next(err);
+        });
 
 }
+
