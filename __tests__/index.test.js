@@ -180,7 +180,6 @@ describe('POST /api/articles/:article_id/comments',()=>{
     test('get a 400 code when trying to insert a comment with missing property',()=>{
         const newComment=
         {body:"This is a really good article"};
-        
         return request(app)
         .post('/api/articles/1/comments')
         .send(newComment)
