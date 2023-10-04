@@ -107,3 +107,16 @@ exports.getUserByUsername = (req, res,next)=>{
 
 
 }
+
+exports.patchCommentByCommentId = (req,res,next) => {
+    const {comment_id}=req.params;
+    const {patchData}=reg.body;
+    updateCommentByCommentId(patchData,comment_id)
+    .then((comment)=>{
+        res.status(201).send({comment})
+    })
+    .catch((err)=>{
+        next(err);
+    })
+
+}

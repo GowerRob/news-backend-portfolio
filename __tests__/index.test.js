@@ -431,3 +431,23 @@ describe('GET /api/users/:username',()=>{
     })
 
 })
+
+describe('PATCH /api/comments/:comment_id',()=>{
+    // test('when a valid positive patch sent to a valid comment returns a 201 and an updated comment object',()=>{
+    //     const patchData={ inc_votes:5};
+    //     return request(app)
+    //     .patch('/api/comments/1')
+    //     .send(patchData)
+    //     .expect(201)
+    //     .then((response)=>{
+    //         console.log(response.body.comment)
+    //         expect(response.body.comment).toMatchObject({
+    //             article_id:1
+
+
+    //         })
+
+    //     })
+
+    // })
+})

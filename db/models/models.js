@@ -133,3 +133,13 @@ exports.fetchUserByUsername=(username)=>{
         
     })
 }    
+
+exports.updateCommentByCommentId=(patchData,comment_id)=>{
+    const queryStr=`
+    UPDATE comments
+    SET votes=votes + $1
+    WHERE arti
+    `
+
+
+}
