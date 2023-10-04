@@ -1,5 +1,6 @@
 const db =require('../connection');
 const format= require('pg-format');
+const { topicData } = require('../data/test-data');
 
 exports.fetchTopics=()=>{
     return db.query('SELECT * from topics;')
@@ -32,8 +33,6 @@ exports.fetchArticleById=(article_id)=>{
         })
 }
 
-
-
 exports.fetchCommentsByArticleId=(article_id)=>{
     const queryStr=`SELECT  comment_id,votes,
         created_at, author, 
@@ -51,16 +50,35 @@ exports.fetchCommentsByArticleId=(article_id)=>{
     })
 }
 
-exports.fetchAllArticles=()=>{
-    const queryStr=`SELECT  articles.author,articles.title,
+exports.fetchAllArticles = (sort_by='created_at', order='DESC')=>{
+    const validSortBy={
+        created_at:"articles.created_at",
+        title:"articles.title",
+        votes:"articles.votes",
+        author:"articles.author",
+        article_id:"articles.article_id",
+        topic:"articles.topic",
+        article_img_url:"articles.article_img_url",
+        comment_count:"comment_count"
+    }
+    const validOrders={
+        DESC:"DESC",
+        ASC:"ASC",
+        asc:"ASC",
+        desc:"DESC"
+    }
+//CAST(COUNT(comments.comment_id as INTEGER) as comment_count
+    let queryStr=`SELECT  articles.author,articles.title,
     articles.article_id,articles.topic,
     articles.created_at,articles.votes, 
-    articles.article_img_url, COUNT(comments.comment_id) as comment_count
+    articles.article_img_url, 
+    CAST(COUNT(comments.article_id) as INTEGER) as comment_count 
     FROM articles
     LEFT JOIN comments On articles.article_id=comments.article_id
     GROUP BY articles.article_id
-    ORDER BY created_at DESC;
+    ORDER BY ${validSortBy[sort_by]} ${validOrders[order]};
     `
+
     return db.query(queryStr)
     .then((response)=>{
             return response.rows;

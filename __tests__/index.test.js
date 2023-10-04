@@ -147,7 +147,7 @@ describe('GET /api/articles',()=>{
                     created_at: expect.any(String),
                     article_img_url: expect.any(String),
                     votes: expect.any(Number),
-                    comment_count: expect.any(String)
+                    comment_count: expect.any(Number)
                 })
             })
         })
@@ -361,6 +361,44 @@ describe('GET /api/users',()=>{
                     avatar_url: expect.any(String),
                 })
             })
+        })
+    })
+
+})
+
+describe('GET /api/articles (sorting queries)',()=>{
+    test('returns all articles desc sorted as per the query when no order provided',()=>{
+        return request(app)
+        .get('/api/articles?sort_by=title')
+        .expect(200)
+        .then((response)=>{
+            expect(response.body.articles).toBeSortedBy('title', {descending:true})
+        })
+    })
+    test('returns all articles sorted by as per the query when order provided',()=>{
+        return request(app)
+        .get('/api/articles?sort_by=votes&order=asc')
+        .expect(200)
+        .then((response)=>{
+
+            expect(response.body.articles).toBeSortedBy('votes')
+        })
+    })
+    test('returns all articles sorted by as per the query when order provided with a non-native column name',()=>{
+        return request(app)
+        .get('/api/articles?sort_by=comment_count&order=asc')
+        .expect(200)
+        .then((response)=>{
+            expect(response.body.articles).toBeSortedBy('comment_count')
+        })
+    })
+
+    test('returns all articles sorted by default (created) when asc order provided',()=>{
+        return request(app)
+        .get('/api/articles?order=asc')
+        .expect(200)
+        .then((response)=>{
+            expect(response.body.articles).toBeSortedBy('created_at')
         })
     })
 

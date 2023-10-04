@@ -19,4 +19,3 @@ if (ENV === 'production') {
 module.exports = new Pool(config);
 
 
-module.exports = new Pool();
