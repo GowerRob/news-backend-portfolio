@@ -67,7 +67,6 @@ exports.fetchAllArticles = (sort_by='created_at', order='DESC')=>{
         asc:"ASC",
         desc:"DESC"
     }
-//CAST(COUNT(comments.comment_id as INTEGER) as comment_count
     let queryStr=`SELECT  articles.author,articles.title,
     articles.article_id,articles.topic,
     articles.created_at,articles.votes, 
@@ -111,11 +110,26 @@ exports.insertComment=(newComment,article_id)=>{
 }
 
 
+
 exports.fetchAllUsers=()=>{
 return db.query(`SELECT  * FROM users;`)
 .then((response)=>{
     return response.rows;
 })
-
-
 }
+
+exports.fetchUserByUsername=(username)=>{
+    return db.query(`
+    SELECT * 
+    FROM users
+    WHERE username= $1;
+    `,[username])
+    .then((response)=>{
+        if(response.rowCount===0){
+            return Promise.reject({status: 404, msg: 'User does not exist'})
+        }else{
+          return response.rows[0]  
+        }
+        
+    })
+}    

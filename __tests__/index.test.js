@@ -401,5 +401,33 @@ describe('GET /api/articles (sorting queries)',()=>{
             expect(response.body.articles).toBeSortedBy('created_at')
         })
     })
+})
+
+
+describe('GET /api/users/:username',()=>{
+    test('get a 200 code',()=>{
+        return request(app)
+        .get('/api/users/butter_bridge')
+        .expect(200)
+    })
+    test('get a correct user object returned when given a valid exisiting user',()=>{
+        return request(app)
+        .get('/api/users/butter_bridge')
+        .expect(200)
+        .then((response)=>{
+            expect(response.body.user.username).toBe('butter_bridge');
+            expect(response.body.user.name).toBe('jonny');
+            expect(response.body.user.avatar_url).toBe('https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg');
+        })
+
+    })
+    test('get a 404 when given a non-existant user',()=>{
+        return request(app)
+        .get('/api/users/butter_fingers')
+        .expect(404)
+        .then((response)=>{
+            expect(response.body.msg).toBe('User does not exist')
+        })
+    })
 
 })

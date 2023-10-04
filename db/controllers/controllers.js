@@ -4,7 +4,8 @@ const { fetchTopics ,
         fetchAllArticles,
         removeCommentById,
         fetchAllUsers,
-        insertComment} = require("../models/models");
+        insertComment,
+        fetchUserByUsername} = require("../models/models");
 
 const {fetchArticleByIds} = require("../models/article.models")
 
@@ -94,3 +95,15 @@ exports.postCommentByArticleId = (req,res,next)=>{
 
 }
 
+exports.getUserByUsername = (req, res,next)=>{
+    const {username}=req.params;
+    fetchUserByUsername(username)
+    .then((user)=>{
+        res.status(200).send({user:user});
+    })
+    .catch((err)=>{
+        next(err);
+    });
+
+
+}
