@@ -7,7 +7,8 @@ const { getTopics,
         getAllArticles,
         deleteCommentById,
         getUsers,
-        postCommentByArticleId} = require("./db/controllers/controllers");
+        postCommentByArticleId,
+        postArticle} = require("./db/controllers/controllers");
 
 const app = express();
 app.use(express.json());
@@ -23,6 +24,8 @@ app.post('/api/articles/:article_id/comments', postCommentByArticleId)
 app.delete('/api/comments/:comment_id', deleteCommentById)
 
 app.get('/api/users',getUsers)
+
+app.post('/api/articles', postArticle)
 
 app.all('/*',(req,res,next)=>{
     res.status(404).send({msg:"bad request"})

@@ -365,3 +365,23 @@ describe('GET /api/users',()=>{
     })
 
 })
+
+describe('POST /api/articles',()=>{
+        // test('get a 201 code when posting a valid article (no img_url)',()=>{
+        //     const newArticle={
+        //         author:"rogersop",
+        //         title:"Getting Jam Off Cats",
+        //         body:"First you need to ask yourself How did the jame get on the cat?",
+        //         topic:"cats",
+        //         };
+            
+        //     return request(app)
+        //     .post('/api/articles')
+        //     .send(newArticle)
+        //     .expect(201)
+    
+        // })
+
+
+
+})

@@ -92,3 +92,9 @@ exports.postCommentByArticleId = (req,res,next)=>{
 
 }
 
+exports.postArticle = (req,res,nect) => {
+    const newArticle=req.body;
+
+
+}
+
