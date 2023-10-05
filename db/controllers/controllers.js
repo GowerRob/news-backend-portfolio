@@ -4,7 +4,8 @@ const { fetchTopics ,
         fetchAllArticles,
         removeCommentById,
         fetchAllUsers,
-        insertComment} = require("../models/models");
+        insertComment,
+        insertArticle} = require("../models/models");
 
 const {fetchArticleByIds} = require("../models/article.models")
 
@@ -92,8 +93,16 @@ exports.postCommentByArticleId = (req,res,next)=>{
 
 }
 
-exports.postArticle = (req,res,nect) => {
+exports.postArticle = (req,res,next) => {
     const newArticle=req.body;
+    insertArticle(newArticle)
+    .then((article)=>{
+        res.status(201).send({article});
+    }) .catch((err)=>{
+        next(err);
+    });
+
+
 
 
 }
