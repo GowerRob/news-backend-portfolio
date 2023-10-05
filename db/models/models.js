@@ -3,7 +3,7 @@ const format= require('pg-format');
 const { topicData } = require('../data/test-data');
 
 exports.fetchTopics=()=>{
-    return db.query('SELECT * from topics;')
+    return db.query('SELECT * from topics;',)
     .then((response)=>{
         return response.rows;
     })
@@ -50,7 +50,9 @@ exports.fetchCommentsByArticleId=(article_id)=>{
     })
 }
 
-exports.fetchAllArticles = (sort_by='created_at', order='DESC')=>{
+exports.fetchAllArticles = (sort_by='created_at', order='DESC', topic)=>{
+    const values=[];
+    
     const validSortBy={
         created_at:"articles.created_at",
         title:"articles.title",
@@ -67,23 +69,48 @@ exports.fetchAllArticles = (sort_by='created_at', order='DESC')=>{
         asc:"ASC",
         desc:"DESC"
     }
-    let queryStr=`SELECT  articles.author,articles.title,
+
+    let queryStr=`SELECT articles.author,articles.title,
     articles.article_id,articles.topic,
     articles.created_at,articles.votes, 
     articles.article_img_url, 
     CAST(COUNT(comments.article_id) as INTEGER) as comment_count 
     FROM articles
-    LEFT JOIN comments On articles.article_id=comments.article_id
-    GROUP BY articles.article_id
-    ORDER BY ${validSortBy[sort_by]} ${validOrders[order]};
+    LEFT JOIN comments ON articles.article_id=comments.article_id
     `
 
-    return db.query(queryStr)
+    if(topic!=undefined){
+        queryStr+=` WHERE articles.topic = $1`
+        values.push(topic)
+    }
+
+    queryStr+= ` GROUP BY articles.article_id ORDER BY ${validSortBy[sort_by]} ${validOrders[order]};
+    `
+    return db.query(queryStr, values)
     .then((response)=>{
             return response.rows;
     })
 }
 
+exports.updateArticleById=(patchData,article_id)=>{
+    const queryStr=`
+    UPDATE articles
+    SET votes=votes + $1
+    WHERE article_id = $2 
+    RETURNING *;
+    `
+    const values=[patchData,article_id];
+    return db.query(queryStr,values)
+    .then((response)=>{
+        if (response.rowCount === 0){
+            
+            return Promise.reject({status: 404, msg: 'Article does not exist'})
+        }   
+        else {
+            return response.rows[0] 
+        }
+    });
+}
 exports.removeCommentById=(comment_id)=>{
     return db.query(`
     DELETE FROM comments

@@ -2,6 +2,7 @@ const { fetchTopics ,
         fetchArticleById,
         fetchCommentsByArticleId,
         fetchAllArticles,
+        updateArticleById,
         removeCommentById,
         fetchAllUsers,
         insertComment,
@@ -9,12 +10,14 @@ const { fetchTopics ,
         updateCommentByCommentId} = require("../models/models");
 
 const {fetchArticleByIds} = require("../models/article.models")
+const {fetchTopicsBySlug}= require("../models/topics.models.js")
 
 const {readFile}=require('fs/promises');
+const { articleData } = require("../data/test-data");
 
 exports.getTopics = (req,res,next)=>{
     fetchTopics().then((topics)=>{
-        res.status(200).send({topics:topics});
+        res.status(200).send({topics});
     }).catch((err)=>{
         next(err)
     });
@@ -32,7 +35,7 @@ exports.getArticleById = (req, res,next)=>{
     const {article_id}=req.params
     fetchArticleById(article_id)
     .then((article)=>{
-        res.status(200).send({article:article});
+        res.status(200).send({article});
     }).catch((err)=>{
         next(err)
     })
@@ -41,19 +44,24 @@ exports.getArticleById = (req, res,next)=>{
 exports.getCommentsByArticleId = (req, res, next)=>{
     const {article_id}=req.params;
 
-    const promises=[fetchCommentsByArticleId(article_id),fetchArticleByIds(article_id)]
+    const promises=[fetchCommentsByArticleId(article_id),fetchArticleById(article_id)]
     Promise.all(promises)
-    .then(([comments,articleDetails])=>{
-        res.status(200).send({comments:comments});
+    .then(([comments])=>{
+        res.status(200).send({comments});
     }).catch((err)=>{
         next(err)
     })
 }
 exports.getAllArticles = (req,res,next)=>{
-    const {sort_by, order}=req.query
-    fetchAllArticles(sort_by, order)
-    .then((articles)=>{
-        res.status(200).send({articles:articles});
+
+   const {sort_by, order,topic}=req.query
+   const promises=[fetchAllArticles(sort_by, order,topic)]
+   if(topic){
+    promises.push(fetchTopicsBySlug(topic))
+   }
+    Promise.all(promises)
+    .then(([articles])=>{
+        res.status(200).send({articles});
     })
     .catch((err)=>{
         console.log(err)
@@ -121,3 +129,18 @@ exports.patchCommentByCommentId = (req,res,next) => {
     })
 
 }
+exports.patchArticleById =(req,res,next)=>{
+    
+    const patchData=req.body;
+    const {article_id}=req.params;
+    updateArticleById(patchData.inc_votes,article_id)
+    .then((article)=>{
+        res.status(201).send({article});
+    }).catch((err)=>{
+        next(err)
+    })
+}
+
+
+
+

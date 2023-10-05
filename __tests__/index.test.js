@@ -137,7 +137,7 @@ describe('GET /api/articles',()=>{
         return request(app)
         .get('/api/articles')
         .then((response)=>{
-            expect(response.body.articles.length).not.toBe(0);
+            expect(response.body.articles.length).toBe(13);
             response.body.articles.forEach((article)=>{
                 expect(article).toMatchObject({
                     author: expect.any(String),
@@ -160,17 +160,9 @@ describe('GET /api/articles',()=>{
             expect(response.body.articles).toBeSortedBy('created_at',{descending:true})
         })
     })
-
 });
 
-    test('expect a 200 when an id that exists but no comments are related to it',()=>{
-        return request(app)
-        .get('/api/articles/2/comments')
-        .expect(200)
-        .then((response)=>{
-            expect(response.body.comments.length).toBe(0);
-        })
-    })
+
 
 describe('POST /api/articles/:article_id/comments',()=>{
     test('get a 201 code',()=>{
@@ -181,6 +173,14 @@ describe('POST /api/articles/:article_id/comments',()=>{
         .send(newComment)
         .expect(201)
 
+    })
+    test('expect a 200 when an id that exists but no comments are related to it',()=>{
+        return request(app)
+        .get('/api/articles/2/comments')
+        .expect(200)
+        .then((response)=>{
+            expect(response.body.comments.length).toBe(0);
+        })
     })
     test('get a 201 code and the inserted comment returned when posting with a valid username and article id',()=>{
         const newComment=
@@ -273,7 +273,7 @@ describe('POST /api/articles/:article_id/comments',()=>{
         .get('/api/articles/999/comments')
         .expect(404)
         .then((response)=>{
-            expect(response.body.msg).toBe('No article with that id');
+            expect(response.body.msg).toBe('Article does not exist');
         })
     });
 
@@ -288,6 +288,100 @@ describe('POST /api/articles/:article_id/comments',()=>{
 
 });
 
+describe('PATCH /api/articles/:article_id',()=>{
+    test('when a valid positive patch is posted, returns a 201 code and an updated article object',()=>{
+        const patchData={inc_votes:7};
+        return request(app)
+        .patch('/api/articles/1')
+        .send(patchData)
+        .expect(201)
+        .then((response)=>{
+                expect(response.body.article).toMatchObject({
+                    article_id: 1,
+                    title: ('Living in the shadow of a great man'),
+                    topic: ('mitch'),
+                    author: ('butter_bridge'),
+                    created_at: expect.any(String),
+                    article_img_url: expect.any(String),
+                    votes: 107,
+                })
+        })
+    })
+    test('when a valid negative patch is posted, returns a 201 code and an updated article object',()=>{
+        const patchData={inc_votes:-50};
+        return request(app)
+        .patch('/api/articles/1')
+        .send(patchData)
+        .expect(201)
+        .then((response)=>{
+                expect(response.body.article).toMatchObject({
+                    article_id: 1,
+                    title: ('Living in the shadow of a great man'),
+                    topic: ('mitch'),
+                    author: ('butter_bridge'),
+                    created_at: expect.any(String),
+                    article_img_url: expect.any(String),
+                    votes: 50,
+                })
+        })
+    })
+
+    test('when an invalid patch is posted, returns a 400 and error message',()=>{
+        const patchData={inc_votes:"banana"};
+        return request(app)
+        .patch('/api/articles/1')
+        .send(patchData)
+        .expect(400)
+        .then((response)=>{
+               expect(response.body.msg).toBe('Bad request')
+        })
+    })
+
+    test('when an valid patch is posted to an article that doesnt exist eg. 88, returns a 404 and error message',()=>{
+        const patchData={inc_votes:200};
+        return request(app)
+        .patch('/api/articles/88')
+        .send(patchData)
+        .expect(404)
+        .then((response)=>{
+               expect(response.body.msg).toBe('Article does not exist')
+        })
+    })
+
+    test('when an valid patch is posted to an invalid article id eg. pen, returns a 400 and error message',()=>{
+        const patchData={inc_votes:200};
+
+        return request(app)
+        .patch('/api/articles/pen')
+        .send(patchData)
+        .expect(400)
+        .then((response)=>{
+               expect(response.body.msg).toBe('Bad request')
+        })
+    })
+    test('when a valid positive patch with extra properties is posted, returns a 201 code and an updated article object',()=>{
+        const patchData={inc_votes:7, extraKey:'hello'};
+        return request(app)
+        .patch('/api/articles/1')
+        .send(patchData)
+        .expect(201)
+        .then((response)=>{
+                expect(response.body.article).toMatchObject({
+                    article_id: 1,
+                    title: ('Living in the shadow of a great man'),
+                    topic: ('mitch'),
+                    author: ('butter_bridge'),
+                    created_at: expect.any(String),
+                    article_img_url: expect.any(String),
+                    votes: 107,
+                })
+        })
+    })
+
+
+
+
+});
 describe('DELETE /api/comments/:comment_id',()=>{
     test('returns a 204 and no content',()=>{
         return request(app)
@@ -336,6 +430,48 @@ describe('GET /api/articles/:article_id (comment_count)',()=>{
             expect(response.body.article.comment_count).toBe(0)
 
         })
+    })
+
+})
+
+describe('GET /api/articles (topic query',()=>{
+    test('return a 200 code and all articles filtered by query when a valid request is made to the api "mitch"',()=>{
+
+        return request(app)
+        .get('/api/articles?topic=mitch')
+        .expect(200)
+        .then((response)=>{
+            expect(response.body.articles.length).toBe(12)
+            response.body.articles.forEach((article)=>{
+                expect(article).toMatchObject({
+                    author: expect.any(String),
+                    article_id: expect.any(Number),
+                    title: expect.any(String),
+                    topic: "mitch",
+                    created_at: expect.any(String),
+                    article_img_url: expect.any(String),
+                    votes: expect.any(Number),
+                    comment_count: expect.any(Number)
+                })
+            })
+        })
+    })
+    test('return a 200 code - no articles associated with query',()=>{
+        return request(app)
+        .get('/api/articles?topic=paper')
+        .expect(200)
+        .then((response)=>{
+            expect(response.body.articles.length).toBe(0)
+        })
+    })
+    test('return a 404 when topic not found',()=>{
+        return request(app)
+        .get('/api/articles?topic=pens')
+        .expect(404)
+        .then((response)=>{
+            expect(response.body.msg).toBe('No topic with that id')
+        })
+
     })
 
 })
