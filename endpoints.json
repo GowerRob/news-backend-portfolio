@@ -57,7 +57,7 @@
 
   "GET /api/articles": {
     "description": "serves all articles in an array, with a count of comments maed about the articles, and sort descending by date created",
-    "queries": [],
+    "queries": ["topic"],
     "exampleResponse": {
       "articles": 
         [{
