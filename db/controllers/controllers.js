@@ -5,7 +5,9 @@ const { fetchTopics ,
         updateArticleById,
         removeCommentById,
         fetchAllUsers,
-        insertComment} = require("../models/models");
+        insertComment,
+        fetchUserByUsername,
+        updateCommentByCommentId} = require("../models/models");
 
 const {fetchArticleByIds} = require("../models/article.models")
 const {fetchTopicsBySlug}= require("../models/topics.models.js")
@@ -51,8 +53,9 @@ exports.getCommentsByArticleId = (req, res, next)=>{
     })
 }
 exports.getAllArticles = (req,res,next)=>{
-   const {topic}=req.query
-   const promises=[fetchAllArticles(topic)]
+
+   const {sort_by, order,topic}=req.query
+   const promises=[fetchAllArticles(sort_by, order,topic)]
    if(topic){
     promises.push(fetchTopicsBySlug(topic))
    }
@@ -61,6 +64,7 @@ exports.getAllArticles = (req,res,next)=>{
         res.status(200).send({articles});
     })
     .catch((err)=>{
+        console.log(err)
         next(err)
     })
 }
@@ -100,6 +104,31 @@ exports.postCommentByArticleId = (req,res,next)=>{
 
 }
 
+exports.getUserByUsername = (req, res,next)=>{
+    const {username}=req.params;
+    fetchUserByUsername(username)
+    .then((user)=>{
+        res.status(200).send({user:user});
+    })
+    .catch((err)=>{
+        next(err);
+    });
+
+
+}
+
+exports.patchCommentByCommentId = (req,res,next) => {
+    const {comment_id}=req.params;
+    const patchData=req.body;
+    updateCommentByCommentId(patchData,comment_id)
+    .then((comment)=>{
+        res.status(201).send({comment})
+    })
+    .catch((err)=>{
+        next(err);
+    })
+
+}
 exports.patchArticleById =(req,res,next)=>{
     
     const patchData=req.body;

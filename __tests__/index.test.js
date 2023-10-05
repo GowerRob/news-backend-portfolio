@@ -147,7 +147,7 @@ describe('GET /api/articles',()=>{
                     created_at: expect.any(String),
                     article_img_url: expect.any(String),
                     votes: expect.any(Number),
-                    comment_count: expect.any(String)
+                    comment_count: expect.any(Number)
                 })
             })
         })
@@ -451,7 +451,7 @@ describe('GET /api/articles (topic query',()=>{
                     created_at: expect.any(String),
                     article_img_url: expect.any(String),
                     votes: expect.any(Number),
-                    comment_count: expect.any(String)
+                    comment_count: expect.any(Number)
                 })
             })
         })
@@ -499,5 +499,130 @@ describe('GET /api/users',()=>{
             })
         })
     })
+
+})
+
+describe('GET /api/articles (sorting queries)',()=>{
+    test('returns all articles desc sorted as per the query when no order provided',()=>{
+        return request(app)
+        .get('/api/articles?sort_by=title')
+        .expect(200)
+        .then((response)=>{
+            expect(response.body.articles).toBeSortedBy('title', {descending:true})
+        })
+    })
+    test('returns all articles sorted by as per the query when order provided',()=>{
+        return request(app)
+        .get('/api/articles?sort_by=votes&order=asc')
+        .expect(200)
+        .then((response)=>{
+
+            expect(response.body.articles).toBeSortedBy('votes')
+        })
+    })
+    test('returns all articles sorted by as per the query when order provided with a non-native column name',()=>{
+        return request(app)
+        .get('/api/articles?sort_by=comment_count&order=asc')
+        .expect(200)
+        .then((response)=>{
+            expect(response.body.articles).toBeSortedBy('comment_count')
+        })
+    })
+
+    test('returns all articles sorted by default (created) when asc order provided',()=>{
+        return request(app)
+        .get('/api/articles?order=asc')
+        .expect(200)
+        .then((response)=>{
+            expect(response.body.articles).toBeSortedBy('created_at')
+        })
+    })
+})
+
+
+describe('GET /api/users/:username',()=>{
+    test('get a 200 code',()=>{
+        return request(app)
+        .get('/api/users/butter_bridge')
+        .expect(200)
+    })
+    test('get a correct user object returned when given a valid exisiting user',()=>{
+        return request(app)
+        .get('/api/users/butter_bridge')
+        .expect(200)
+        .then((response)=>{
+            expect(response.body.user.username).toBe('butter_bridge');
+            expect(response.body.user.name).toBe('jonny');
+            expect(response.body.user.avatar_url).toBe('https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg');
+        })
+
+    })
+    test('get a 404 when given a non-existant user',()=>{
+        return request(app)
+        .get('/api/users/butter_fingers')
+        .expect(404)
+        .then((response)=>{
+            expect(response.body.msg).toBe('User does not exist')
+        })
+    })
+
+})
+
+describe('PATCH /api/comments/:comment_id',()=>{
+    test('when a valid patch sent to a valid comment returns a 201 and an updated comment object',()=>{
+        const patchData={ inc_votes:5};
+        return request(app)
+        .patch('/api/comments/1')
+        .send(patchData)
+        .expect(201)
+        .then((response)=>{
+            expect(response.body.comment).toMatchObject({
+                comment_id:1,
+                body:"Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+                article_id: 9,
+                votes: 21,
+            })
+
+        })
+    })
+    test('when a valid patch is sent to a non-existant comment, 404 and comment',()=>{
+        const patchData={ inc_votes:5};
+        return request(app)
+        .patch('/api/comments/999')
+        .send(patchData)
+        .expect(404)
+        .then((response)=>{
+            expect(response.body.msg).toBe("Comment does not exist")
+        })
+    })
+    test('when an valid patch is sent to an invalid comment_id, 400 and comment',()=>{
+        const patchData={ inc_votes:5};
+        return request(app)
+        .patch('/api/comments/banana')
+        .send(patchData)
+        .expect(400)
+        .then((response)=>{
+            expect(response.body.msg).toBe("Bad request")
+        })
+    })
+    test('when an invalid patch is sent to an valid comment_id',()=>{
+        const patchData={ inc_votes:"banana"};
+        return request(app)
+        .patch('/api/comments/banana')
+        .send(patchData)
+        .expect(400)
+        .then((response)=>{
+            expect(response.body.msg).toBe("Bad request")
+        })
+    })
+    test('when an valid patch is sent to an valid comment_id, but with extra properties, ignore properties',()=>{
+        const patchData={ inc_votes:6, favourite_egg:"boiled"};
+        return request(app)
+        .patch('/api/comments/1')
+        .send(patchData)
+        .expect(201)
+
+    })
+
 
 })
