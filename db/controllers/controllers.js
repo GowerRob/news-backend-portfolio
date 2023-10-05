@@ -10,7 +10,7 @@ const { articleData } = require("../data/test-data");
 
 exports.getTopics = (req,res,next)=>{
     fetchTopics().then((topics)=>{
-        res.status(200).send({topics:topics});
+        res.status(200).send({topics});
     }).catch((err)=>{
         next(err)
     });
@@ -29,7 +29,7 @@ exports.getArticleById = (req, res,next)=>{
     const {article_id}=req.params
     fetchArticleById(article_id)
     .then((article)=>{
-        res.status(200).send({article:article});
+        res.status(200).send({article});
     }).catch((err)=>{
         next(err)
     })
@@ -41,7 +41,7 @@ exports.getCommentsByArticleId = (req, res, next)=>{
     const promises=[fetchCommentsByArticleId(article_id),fetchArticleById(article_id)]
     Promise.all(promises)
     .then(([comments])=>{
-        res.status(200).send({comments:comments});
+        res.status(200).send({comments});
     }).catch((err)=>{
         next(err)
     })
@@ -49,7 +49,7 @@ exports.getCommentsByArticleId = (req, res, next)=>{
 exports.getAllArticles = (req,res,next)=>{
     fetchAllArticles()
     .then((articles)=>{
-        res.status(200).send({articles:articles});
+        res.status(200).send({articles});
     }).catch((err)=>{
         next(err)
     })
@@ -62,7 +62,7 @@ exports.patchArticleById =(req,res,next)=>{
     const {article_id}=req.params;
     updateArticleById(patchData.inc_votes,article_id)
     .then((article)=>{
-        res.status(201).send({article:article});
+        res.status(201).send({article});
     }).catch((err)=>{
         next(err)
     })

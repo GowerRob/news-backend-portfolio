@@ -264,7 +264,27 @@ describe('PATCH /api/articles/:article_id',()=>{
                expect(response.body.msg).toBe('Bad request')
         })
     })
-  
-  
+    test('when a valid positive patch with extra properties is posted, returns a 201 code and an updated article object',()=>{
+        const patchData={inc_votes:7, extraKey:'hello'};
+        return request(app)
+        .patch('/api/articles/1')
+        .send(patchData)
+        .expect(201)
+        .then((response)=>{
+                expect(response.body.article).toMatchObject({
+                    article_id: 1,
+                    title: ('Living in the shadow of a great man'),
+                    topic: ('mitch'),
+                    author: ('butter_bridge'),
+                    created_at: expect.any(String),
+                    article_img_url: expect.any(String),
+                    votes: 107,
+                })
+        })
+    })
+
+
+
+
 });
 
