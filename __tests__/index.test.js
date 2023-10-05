@@ -433,21 +433,60 @@ describe('GET /api/users/:username',()=>{
 })
 
 describe('PATCH /api/comments/:comment_id',()=>{
-    // test('when a valid positive patch sent to a valid comment returns a 201 and an updated comment object',()=>{
-    //     const patchData={ inc_votes:5};
-    //     return request(app)
-    //     .patch('/api/comments/1')
-    //     .send(patchData)
-    //     .expect(201)
-    //     .then((response)=>{
-    //         console.log(response.body.comment)
-    //         expect(response.body.comment).toMatchObject({
-    //             article_id:1
+    test('when a valid patch sent to a valid comment returns a 201 and an updated comment object',()=>{
+        const patchData={ inc_votes:5};
+        return request(app)
+        .patch('/api/comments/1')
+        .send(patchData)
+        .expect(201)
+        .then((response)=>{
+            expect(response.body.comment).toMatchObject({
+                comment_id:1,
+                body:"Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+                article_id: 9,
+                votes: 21,
+            })
+
+        })
+    })
+    test('when a valid patch is sent to a non-existant comment, 404 and comment',()=>{
+        const patchData={ inc_votes:5};
+        return request(app)
+        .patch('/api/comments/999')
+        .send(patchData)
+        .expect(404)
+        .then((response)=>{
+            expect(response.body.msg).toBe("Comment does not exist")
+        })
+    })
+    test('when an valid patch is sent to an invalid comment_id, 400 and comment',()=>{
+        const patchData={ inc_votes:5};
+        return request(app)
+        .patch('/api/comments/banana')
+        .send(patchData)
+        .expect(400)
+        .then((response)=>{
+            expect(response.body.msg).toBe("Bad request")
+        })
+    })
+    test('when an invalid patch is sent to an valid comment_id',()=>{
+        const patchData={ inc_votes:"banana"};
+        return request(app)
+        .patch('/api/comments/banana')
+        .send(patchData)
+        .expect(400)
+        .then((response)=>{
+            expect(response.body.msg).toBe("Bad request")
+        })
+    })
+    test('when an valid patch is sent to an valid comment_id, but with extra properties, ignore properties',()=>{
+        const patchData={ inc_votes:6, favourite_egg:"boiled"};
+        return request(app)
+        .patch('/api/comments/1')
+        .send(patchData)
+        .expect(201)
+
+    })
 
 
-    //         })
-
-    //     })
-
-    // })
 })

@@ -138,8 +138,18 @@ exports.updateCommentByCommentId=(patchData,comment_id)=>{
     const queryStr=`
     UPDATE comments
     SET votes=votes + $1
-    WHERE arti
-    `
+    WHERE comment_id = $2
+    RETURNING *
+    ;`
+    const queryValues=[patchData.inc_votes, Number(comment_id)];
+    return db.query(queryStr,queryValues)
+    .then((response)=>{
+        if(response.rowCount===0){
+            return Promise.reject({status: 404, msg: 'Comment does not exist'})
+        }else{
+          return response.rows[0]  
+        }
+    })
 
 
 }

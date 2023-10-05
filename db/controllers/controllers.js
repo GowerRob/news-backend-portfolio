@@ -5,7 +5,8 @@ const { fetchTopics ,
         removeCommentById,
         fetchAllUsers,
         insertComment,
-        fetchUserByUsername} = require("../models/models");
+        fetchUserByUsername,
+        updateCommentByCommentId} = require("../models/models");
 
 const {fetchArticleByIds} = require("../models/article.models")
 
@@ -110,7 +111,7 @@ exports.getUserByUsername = (req, res,next)=>{
 
 exports.patchCommentByCommentId = (req,res,next) => {
     const {comment_id}=req.params;
-    const {patchData}=reg.body;
+    const patchData=req.body;
     updateCommentByCommentId(patchData,comment_id)
     .then((comment)=>{
         res.status(201).send({comment})
