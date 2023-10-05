@@ -1,5 +1,4 @@
 const db =require('../connection');
-const format= require('pg-format');
 
 exports.fetchTopics=()=>{
     return db.query('SELECT * from topics;',)
@@ -75,6 +74,25 @@ exports.fetchAllArticles=(topic)=>{
     })
 }
 
+exports.updateArticleById=(patchData,article_id)=>{
+    const queryStr=`
+    UPDATE articles
+    SET votes=votes + $1
+    WHERE article_id = $2 
+    RETURNING *;
+    `
+    const values=[patchData,article_id];
+    return db.query(queryStr,values)
+    .then((response)=>{
+        if (response.rowCount === 0){
+            
+            return Promise.reject({status: 404, msg: 'Article does not exist'})
+        }   
+        else {
+            return response.rows[0] 
+        }
+    });
+}
 exports.removeCommentById=(comment_id)=>{
     return db.query(`
     DELETE FROM comments
