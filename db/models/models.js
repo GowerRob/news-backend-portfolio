@@ -2,7 +2,7 @@ const db =require('../connection');
 const format= require('pg-format');
 
 exports.fetchTopics=()=>{
-    return db.query('SELECT * from topics;')
+    return db.query('SELECT * from topics;',)
     .then((response)=>{
         return response.rows;
     })
@@ -52,9 +52,8 @@ exports.fetchCommentsByArticleId=(article_id)=>{
 }
 
 exports.fetchAllArticles=(topic)=>{
-    
-    const values=[]
-    let queryStr=`SELECT  articles.author,articles.title,
+    const values=[];
+    let queryStr=`SELECT articles.author,articles.title,
     articles.article_id,articles.topic,
     articles.created_at,articles.votes, 
     articles.article_img_url, COUNT(comments.comment_id) as comment_count
@@ -67,10 +66,12 @@ exports.fetchAllArticles=(topic)=>{
     }
     queryStr+=`GROUP BY articles.article_id
     ORDER BY created_at DESC;`
-    
-    return db.query(queryStr,values).
-    then((response)=>{
+
+    return db.query(queryStr, values)
+    .then((response)=>{
             return response.rows;
+          
+            
     })
 }
 

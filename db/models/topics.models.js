@@ -1,6 +1,7 @@
 const db =require('../connection');
 
 exports.fetchTopicsBySlug = (topic) =>{
+
         return db.
         query("SELECT * FROM topics WHERE slug = $1", [topic])
         .then((result)=>{

@@ -137,7 +137,7 @@ describe('GET /api/articles',()=>{
         return request(app)
         .get('/api/articles')
         .then((response)=>{
-            expect(response.body.articles.length).not.toBe(0);
+            expect(response.body.articles.length).toBe(13);
             response.body.articles.forEach((article)=>{
                 expect(article).toMatchObject({
                     author: expect.any(String),
@@ -341,35 +341,43 @@ describe('GET /api/articles/:article_id (comment_count)',()=>{
 })
 
 describe('GET /api/articles (topic query',()=>{
-    test('return a 200 code when a request is made to the api',()=>{
-        return request(app)
-        .get('/api/articles?topic=mitch')
-        .expect(200)
-    })
-    test('return a 200 code and allarticles filtered by query when a valid request is made to the api "mitch"',()=>{
+    test('return a 200 code and all articles filtered by query when a valid request is made to the api "mitch"',()=>{
 
         return request(app)
         .get('/api/articles?topic=mitch')
         .expect(200)
         .then((response)=>{
             expect(response.body.articles.length).toBe(12)
+            response.body.articles.forEach((article)=>{
+                expect(article).toMatchObject({
+                    author: expect.any(String),
+                    article_id: expect.any(Number),
+                    title: expect.any(String),
+                    topic: "mitch",
+                    created_at: expect.any(String),
+                    article_img_url: expect.any(String),
+                    votes: expect.any(Number),
+                    comment_count: expect.any(String)
+                })
+            })
         })
     })
-    test('return a 200 code and all articles filtered by query when a valid request is made to the api "cats"',()=>{
-        return request(app)
-        .get('/api/articles?topic=cats')
-        .expect(200)
-        .then((response)=>{
-            expect(response.body.articles.length).toBe(1)
-        })
-    })
-    test('return a 200 code and all articles filtered by query when a valid request is made to the api "paper"',()=>{
+    test('return a 200 code - no articles associated with query',()=>{
         return request(app)
         .get('/api/articles?topic=paper')
         .expect(200)
         .then((response)=>{
             expect(response.body.articles.length).toBe(0)
         })
+    })
+    test('return a 404 when topic not found',()=>{
+        return request(app)
+        .get('/api/articles?topic=pens')
+        .expect(404)
+        .then((response)=>{
+            expect(response.body.msg).toBe('No topic with that id')
+        })
+
     })
 
 })
