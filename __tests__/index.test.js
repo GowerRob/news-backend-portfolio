@@ -894,7 +894,7 @@ describe('GET /api/articles/:article_id/comments (pagination)',()=>{
         })
 })
 
-describe.only('POST /api/topics',()=>{
+describe('POST /api/topics',()=>{
     test('responds with a 201 and returns the correctly inserted topic',()=>{
         const newTopic={
             slug:"headphones",
