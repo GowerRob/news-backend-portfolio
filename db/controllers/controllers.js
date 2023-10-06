@@ -43,8 +43,10 @@ exports.getArticleById = (req, res,next)=>{
 
 exports.getCommentsByArticleId = (req, res, next)=>{
     const {article_id}=req.params;
-
-    const promises=[fetchCommentsByArticleId(article_id),fetchArticleById(article_id)]
+    const {limit,p}=req.query;
+    console.log("Here in cont")
+    console.log(limit, p)
+    const promises=[fetchCommentsByArticleId(article_id, limit, p),fetchArticleById(article_id)]
     Promise.all(promises)
     .then(([comments])=>{
         res.status(200).send({comments});
@@ -54,8 +56,8 @@ exports.getCommentsByArticleId = (req, res, next)=>{
 }
 exports.getAllArticles = (req,res,next)=>{
 
-   const {sort_by, order,topic}=req.query
-   const promises=[fetchAllArticles(sort_by, order,topic)]
+   const {sort_by, order,topic,limit,p}=req.query
+   const promises=[fetchAllArticles(sort_by, order,topic,limit,p)]
    if(topic){
     promises.push(fetchTopicsBySlug(topic))
    }

@@ -135,7 +135,7 @@ describe('GET /api/articles',()=>{
 
     test('expect an array of objects with the correct keys',()=>{
         return request(app)
-        .get('/api/articles')
+        .get('/api/articles?limit=13')
         .then((response)=>{
             expect(response.body.articles.length).toBe(13);
             response.body.articles.forEach((article)=>{
@@ -438,7 +438,7 @@ describe('GET /api/articles (topic query',()=>{
     test('return a 200 code and all articles filtered by query when a valid request is made to the api "mitch"',()=>{
 
         return request(app)
-        .get('/api/articles?topic=mitch')
+        .get('/api/articles?topic=mitch&limit=20')
         .expect(200)
         .then((response)=>{
             expect(response.body.articles.length).toBe(12)
@@ -501,6 +501,7 @@ describe('GET /api/users',()=>{
     })
 
 })
+
 
 describe('GET /api/articles (sorting queries)',()=>{
     test('returns all articles desc sorted as per the query when no order provided',()=>{
@@ -623,6 +624,122 @@ describe('PATCH /api/comments/:comment_id',()=>{
         .expect(201)
 
     })
+})
 
+describe('GET /api/articles (pagination)',()=>{
+    test('responds with 200 and articles according to the limit and page passed',()=>{
+        return request(app)
+        .get('/api/articles?sort_by=article_id&order=asc&limit=3&p=2')
+        .expect(200)
+        .then((response)=>{
+            expect(response.body.articles.length).toBe(3)
+            response.body.articles.forEach((article)=>{
+                expect(Number(article.article_id)).toBeGreaterThanOrEqual(4)
+                expect(Number(article.article_id)).toBeLessThan(7)
+            })
+        })
+    })
+    test('responds with 200 and default behaviour when query term omitted (p)',()=>{
+        return request(app)
+        .get('/api/articles?sort_by=article_id&order=asc&limit=6')
+        .expect(200)
+        .then((response)=>{
+            expect(response.body.articles.length).toBe(6)
+            response.body.articles.forEach((article)=>{
+                expect(Number(article.article_id)).toBeGreaterThanOrEqual(1)
+                expect(Number(article.article_id)).toBeLessThan(7)
+            })
+        })
+    })    
+    test('responds with 200 and default behaviour when query term omitted limit',()=>{
+        return request(app)
+        .get('/api/articles?sort_by=article_id&order=asc&p=2')
+        .expect(200)
+        .then((response)=>{
+            expect(response.body.articles.length).toBe(3)
+            response.body.articles.forEach((article)=>{
+                expect(Number(article.article_id)).toBeGreaterThanOrEqual(11)
+                expect(Number(article.article_id)).toBeLessThan(14)
+            })
+        })
+    })
+    test('responds with 200 and default behaviour when query both terms omitted',()=>{
+        return request(app)
+        .get('/api/articles?sort_by=article_id&order=asc')
+        .expect(200)
+        .then((response)=>{
+            expect(response.body.articles.length).toBe(10)
+            response.body.articles.forEach((article)=>{
+                expect(Number(article.article_id)).toBeGreaterThanOrEqual(1)
+                expect(Number(article.article_id)).toBeLessThan(11)
+            })
+        })
+    })
+
+    test('responds with a 200 when a request is made out of range',()=>{
+        return request(app)
+        .get('/api/articles?sort_by=article_id&order=asc&limit=10&p=5')
+        .expect(200)
+        .then((response)=>{
+            expect(response.body.articles.length).toBe(0)
+        })
+    })
 
 })
+
+describe('GET /api/articles/:article_id/comments (pagination)',()=>{
+    test('responds with 200 and comments according to the limit and page passed',()=>{
+        return request(app)
+        .get('/api/articles/1/comments?limit=3&p=1')
+        .expect(200)
+        .then((response)=>{
+            console.log("here in testing")
+            console.log(response.body.comments)
+            expect(response.body.comments.length).toBe(3)
+        })
+    })
+
+    test('responds with 200 and default behaviour when query term omitted (p)',()=>{
+        return request(app)
+        .get('/api/articles/1/comments?limit=4')
+        .expect(200)
+        .then((response)=>{
+            console.log("here in testing")
+            console.log(response.body.comments)
+            expect(response.body.comments.length).toBe(4)
+         })
+        })
+
+    test('responds with 200 and default behaviour when query term omitted (limit)',()=>{
+        return request(app)
+        .get('/api/articles/1/comments?p=1')
+        .expect(200)
+        .then((response)=>{
+            console.log("here in testing")
+            console.log(response.body.comments)
+            expect(response.body.comments.length).toBe(10)
+            })
+        })
+
+        test('responds with 200 and default behaviour when  both query terms omitted ',()=>{
+            return request(app)
+            .get('/api/articles/1/comments')
+            .expect(200)
+            .then((response)=>{
+                console.log("here in testing")
+                console.log(response.body.comments)
+                expect(response.body.comments.length).toBe(10)
+                })
+            })
+
+        test('responds with a 200 when a request is made out of range, with empty array',()=>{
+            return request(app)
+            .get('/api/articles?sort_by=article_id&order=asc&limit=10&p=6')
+            .expect(200)
+            .then((response)=>{
+                expect(response.body.articles.length).toBe(0)
+            })
+        })
+
+})
+
