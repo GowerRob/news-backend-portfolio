@@ -88,3 +88,14 @@ It's contents should be
 ## Minimum versions 
 Node.js     v20.5.1     
 psql        14.9
+
+
+### Additional Portfolio Notes
+This project demostrates:
+    Querying a database.
+    Using a TDD approach to cover both the happy and error paths.
+    Setting a RESTful API with a number of endpoints which cover CRUD operations.
+    Setting up parametric endpoints.
+    Handling complex queries.
+    Manipulating data to respond to client requirements.
+    Hosting a server and DB.
