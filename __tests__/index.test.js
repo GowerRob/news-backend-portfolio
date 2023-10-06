@@ -853,8 +853,6 @@ describe('GET /api/articles/:article_id/comments (pagination)',()=>{
         .get('/api/articles/1/comments?limit=3&p=1')
         .expect(200)
         .then((response)=>{
-            console.log("here in testing")
-            console.log(response.body.comments)
             expect(response.body.comments.length).toBe(3)
         })
     })
@@ -864,8 +862,6 @@ describe('GET /api/articles/:article_id/comments (pagination)',()=>{
         .get('/api/articles/1/comments?limit=4')
         .expect(200)
         .then((response)=>{
-            console.log("here in testing")
-            console.log(response.body.comments)
             expect(response.body.comments.length).toBe(4)
          })
         })
@@ -875,8 +871,6 @@ describe('GET /api/articles/:article_id/comments (pagination)',()=>{
         .get('/api/articles/1/comments?p=1')
         .expect(200)
         .then((response)=>{
-            console.log("here in testing")
-            console.log(response.body.comments)
             expect(response.body.comments.length).toBe(10)
             })
         })
@@ -886,8 +880,6 @@ describe('GET /api/articles/:article_id/comments (pagination)',()=>{
             .get('/api/articles/1/comments')
             .expect(200)
             .then((response)=>{
-                console.log("here in testing")
-                console.log(response.body.comments)
                 expect(response.body.comments.length).toBe(10)
                 })
             })
@@ -900,6 +892,64 @@ describe('GET /api/articles/:article_id/comments (pagination)',()=>{
                 expect(response.body.articles.length).toBe(0)
             })
         })
-
 })
 
+describe('POST /api/topics',()=>{
+    test('responds with a 201 and returns the correctly inserted topic',()=>{
+        const newTopic={
+            slug:"headphones",
+            description:"Useful for listening to music, or pretending you are listening to music"
+            };
+    
+        return request(app)
+        .post('/api/topics')
+        .send(newTopic)
+        .expect(201)
+        .then((response)=>{
+            expect(response.body.topic.slug).toBe('headphones')
+            expect(response.body.topic.description).toBe('Useful for listening to music, or pretending you are listening to music')
+        })
+    })
+
+    test('responds with a 201 and returns the correctly inserted topic, when extra properties added',()=>{
+        const newTopic={
+            slug:"headphones",
+            description:"Useful for listening to music, or pretending you are listening to music",
+            extra:" This is extra"
+            };
+        return request(app)
+        .post('/api/topics')
+        .send(newTopic)
+        .expect(201)
+        .then((response)=>{
+            expect(response.body.topic.slug).toBe('headphones')
+            expect(response.body.topic.description).toBe('Useful for listening to music, or pretending you are listening to music')
+            expect(response.body.topic.hasOwnProperty('extra')).toBe(false);
+        })
+    })
+
+    test('responds with a 400 when topic fields missing primary field slug',()=>{
+        const newTopic={
+            description:"headphones"
+            };
+        return request(app)
+        .post('/api/topics')
+        .send(newTopic)
+        .expect(400)
+    })
+
+    test('responds with a 201 when non primary fields missing - description',()=>{
+        const newTopic={
+            slug:"headphones"
+            };
+        return request(app)
+        .post('/api/topics')
+        .send(newTopic)
+        .expect(201)
+        .then((response)=>{
+            expect(response.body.topic.slug).toBe('headphones')
+            expect(response.body.topic.description).toBe(null)
+        })
+    })
+
+})

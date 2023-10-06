@@ -33,7 +33,6 @@ exports.fetchArticleById=(article_id)=>{
 }
 
 exports.fetchCommentsByArticleId=(article_id,limit=10,p=1)=>{
-    console.log("Here in model 1", limit, p)
     const queryStr=`SELECT  comment_id,votes,
         created_at, author, 
         body,article_id
@@ -44,7 +43,6 @@ exports.fetchCommentsByArticleId=(article_id,limit=10,p=1)=>{
 
     return db.query(queryStr,[article_id,limit,((p-1)*limit)])
     .then((results)=>{
-        console.log("Here in model 2")
             return results.rows;
           
 
@@ -199,8 +197,22 @@ exports.insertArticle=(newArticle)=>{
     return db.query(queryStr,values)
     .then((response)=>{
         return response.rows[0];
-
-
-
 });
+}
+
+exports.insertTopic=(newTopic)=>{
+    const queryStr=`INSERT  INTO topics
+    (slug,description)
+    VALUES ($1,$2)
+    RETURNING *
+    ;`;
+
+    const values=[newTopic.slug,newTopic.description]
+    return db.query(queryStr,values)
+    .then((response)=>{
+        return response.rows[0];
+    });
+
+
+
 }

@@ -8,7 +8,8 @@ const { fetchTopics ,
         insertComment,
         insertArticle,
         fetchUserByUsername,
-        updateCommentByCommentId} = require("../models/models");
+        updateCommentByCommentId,
+        insertTopic} = require("../models/models");
 
 const {fetchArticleByIds} = require("../models/article.models")
 const {fetchTopicsBySlug}= require("../models/topics.models.js")
@@ -45,8 +46,6 @@ exports.getArticleById = (req, res,next)=>{
 exports.getCommentsByArticleId = (req, res, next)=>{
     const {article_id}=req.params;
     const {limit,p}=req.query;
-    console.log("Here in cont")
-    console.log(limit, p)
     const promises=[fetchCommentsByArticleId(article_id, limit, p),fetchArticleById(article_id)]
     Promise.all(promises)
     .then(([comments])=>{
@@ -67,7 +66,6 @@ exports.getAllArticles = (req,res,next)=>{
         res.status(200).send({articles});
     })
     .catch((err)=>{
-        console.log(err)
         next(err)
     })
 }
@@ -151,6 +149,16 @@ exports.patchArticleById =(req,res,next)=>{
     }).catch((err)=>{
         next(err)
     })
+}
+
+exports.postTopic = (req,res,next)=>{
+    const newTopic=req.body;
+    insertTopic(newTopic)
+    .then((topic)=>{
+        res.status(201).send({topic});
+    }) .catch((err)=>{
+        next(err);
+    });
 }
 
 
