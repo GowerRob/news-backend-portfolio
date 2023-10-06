@@ -6,6 +6,7 @@ const { fetchTopics ,
         removeCommentById,
         fetchAllUsers,
         insertComment,
+        insertArticle,
         fetchUserByUsername,
         updateCommentByCommentId} = require("../models/models");
 
@@ -94,7 +95,6 @@ exports.getUsers = (req,res,next)=>{
 exports.postCommentByArticleId = (req,res,next)=>{
     const newComment=req.body;
     const {article_id}=req.params;
- 
     const promises=[insertComment(newComment,article_id),fetchArticleById(article_id)];
     Promise.all(promises)
     .then(([comment,articleData])=>{
@@ -104,6 +104,16 @@ exports.postCommentByArticleId = (req,res,next)=>{
             next(err);
         });
 
+}
+
+exports.postArticle = (req,res,next) => {
+    const newArticle=req.body;
+    insertArticle(newArticle)
+    .then((article)=>{
+        res.status(201).send({article});
+    }) .catch((err)=>{
+        next(err);
+    });
 }
 
 exports.getUserByUsername = (req, res,next)=>{

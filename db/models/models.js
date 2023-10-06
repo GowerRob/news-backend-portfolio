@@ -25,9 +25,8 @@ exports.fetchArticleById=(article_id)=>{
             
             if(results.rows.length===0){
                 
-                return Promise.reject({status:404, msg:"Article does not exist"})
+                return Promise.reject({status:404, msg:"Article does not exist"});
               }else{
-                
                 return results.rows[0];
               }
         })
@@ -180,5 +179,28 @@ exports.updateCommentByCommentId=(patchData,comment_id)=>{
         }
     })
 
+}
 
+exports.insertArticle=(newArticle)=>{
+    const queryStr=`INSERT  INTO articles 
+    (title,topic,author,body,article_img_url)
+    VALUES ($1,$2,$3,$4,$5)
+    RETURNING *
+    ;`
+
+
+    const values=[newArticle.title,
+        newArticle.topic,
+        newArticle.author,
+        newArticle.body,
+        newArticle.article_img_url||"https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+        ]
+
+    return db.query(queryStr,values)
+    .then((response)=>{
+        return response.rows[0];
+
+
+
+});
 }

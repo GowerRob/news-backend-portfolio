@@ -239,7 +239,7 @@ describe('POST /api/articles/:article_id/comments',()=>{
         .send(newComment)
         .expect(404)
         .then((response)=>{
-            expect(response.body.msg).toBe('Bad request')
+            expect(response.body.msg).toBe('Not found')
         })
     })
     test('get a 400 code and error message when the article id is invalid (not possible id) -> cheese',()=>{
@@ -264,7 +264,7 @@ describe('POST /api/articles/:article_id/comments',()=>{
         .send(newComment)
         .expect(404)
         .then((response)=>{
-            expect(response.body.msg).toBe('Bad request')
+            expect(response.body.msg).toBe('Not found')
         })
     })
 
@@ -502,6 +502,166 @@ describe('GET /api/users',()=>{
 
 })
 
+describe('POST /api/articles',()=>{
+        test('get a 201 code when posting a valid article (no img_url provide)',()=>{
+            const newArticle={
+                author:"rogersop",
+                title:"Getting Jam Off Cats",
+                body:"First you need to ask yourself how did the jam get on the cat?",
+                topic:"cats",
+                };
+            
+            return request(app)
+            .post('/api/articles')
+            .send(newArticle)
+            .expect(201)
+            .then((response)=>{
+                expect(response.body.article.article_id).toBe(14)
+                expect(response.body.article.title).toBe('Getting Jam Off Cats')
+                expect(response.body.article.topic).toBe('cats')
+                expect(response.body.article.author).toBe('rogersop')
+                expect(response.body.article.body).toBe('First you need to ask yourself how did the jam get on the cat?')
+                expect(typeof response.body.article.created_at).toBe('string')
+                expect(response.body.article.votes).toBe(0)
+                expect(response.body.article.article_img_url).toBe('https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700')
+                
+            })
+    
+        })
+
+        test('get a 201 code when posting a valid article (img_url provided)',()=>{
+            const newArticle={
+                author:"rogersop",
+                title:"Getting Jam Off Cats",
+                body:"First you need to ask yourself how did the jam get on the cat?",
+                topic:"cats",
+                article_img_url:"https://my_custom_image_url.com/1.jpeg"
+                };
+            
+            return request(app)
+            .post('/api/articles')
+            .send(newArticle)
+            .expect(201)
+            .then((response)=>{
+                expect(response.body.article.article_id).toBe(14)
+                expect(response.body.article.title).toBe('Getting Jam Off Cats')
+                expect(response.body.article.topic).toBe('cats')
+                expect(response.body.article.author).toBe('rogersop')
+                expect(response.body.article.body).toBe('First you need to ask yourself how did the jam get on the cat?')
+                expect(typeof response.body.article.created_at).toBe('string')
+                expect(response.body.article.votes).toBe(0)
+                expect(response.body.article.article_img_url).toBe("https://my_custom_image_url.com/1.jpeg")
+            })
+        })
+
+        test('get a 201 code when posting a valid article with extra properties',()=>{
+            const newArticle={
+                author:"rogersop",
+                title:"Getting Jam Off Cats",
+                body:"First you need to ask yourself how did the jam get on the cat?",
+                topic:"cats",
+                article_img_url:"https://my_custom_image_url.com/1.jpeg",
+                ink_colour:"blue"
+                };
+            
+            return request(app)
+            .post('/api/articles')
+            .send(newArticle)
+            .expect(201)
+            .then((response)=>{
+                expect(response.body.article.article_id).toBe(14)
+                expect(response.body.article.title).toBe('Getting Jam Off Cats')
+                expect(response.body.article.topic).toBe('cats')
+                expect(response.body.article.author).toBe('rogersop')
+                expect(response.body.article.body).toBe('First you need to ask yourself how did the jam get on the cat?')
+                expect(typeof response.body.article.created_at).toBe('string')
+                expect(response.body.article.votes).toBe(0)
+                expect(response.body.article.article_img_url).toBe("https://my_custom_image_url.com/1.jpeg")
+                expect(response.body.article.hasOwnProperty('ink_colour')).toBe(false);  
+            })
+        })
+
+        test('get a 404 code when posting article with non-existant author',()=>{
+            const newArticle={
+                author:"wooly",
+                title:"Getting Jam Off Cats",
+                body:"First you need to ask yourself how did the jam get on the cat?",
+                topic:"cats",
+                article_img_url:"https://my_custom_image_url.com/1.jpeg",
+                ink_colour:"blue"
+                };
+            
+            return request(app)
+            .post('/api/articles')
+            .send(newArticle)
+            .expect(404)
+            .then((response)=>{
+                expect(response.body.msg).toBe("Not found")
+            })
+        })
+
+        test('get a 404 code when posting article with non-existant topic',()=>{
+            const newArticle={
+                author:"rogersop",
+                title:"Getting Jam Off Cats",
+                body:"First you need to ask yourself how did the jam get on the cat?",
+                topic:"jam",
+                article_img_url:"https://my_custom_image_url.com/1.jpeg",
+                };
+            
+            return request(app)
+            .post('/api/articles')
+            .send(newArticle)
+            .expect(404)
+            .then((response)=>{
+                expect(response.body.msg).toBe("Not found")
+            })
+        })
+
+        test('get a 400 code when posting article with missing properties',()=>{
+            const newArticle={
+                title:"Getting Jam Off Cats",
+                body:"First you need to ask yourself how did the jam get on the cat?",
+                topic:"cats",
+                article_img_url:"https://my_custom_image_url.com/1.jpeg",
+                };
+            
+            return request(app)
+            .post('/api/articles')
+            .send(newArticle)
+            .expect(400)
+            .then((response)=>{
+                expect(response.body.msg).toBe("Bad request")
+            })
+        })
+        test('get a 201 code when posting article that attempts to overwrite a default property (overwritten property set to default',()=>{
+            const newArticle={
+                author:"rogersop",
+                title:"Getting Jam Off Cats",
+                body:"First you need to ask yourself how did the jam get on the cat?",
+                topic:"cats",
+                article_img_url:"https://my_custom_image_url.com/1.jpeg",
+                votes:5000
+                };
+            
+            return request(app)
+            .post('/api/articles')
+            .send(newArticle)
+            .expect(201)
+            .then((response)=>{
+                expect(response.body.article.article_id).toBe(14)
+                expect(response.body.article.title).toBe('Getting Jam Off Cats')
+                expect(response.body.article.topic).toBe('cats')
+                expect(response.body.article.author).toBe('rogersop')
+                expect(response.body.article.body).toBe('First you need to ask yourself how did the jam get on the cat?')
+                expect(typeof response.body.article.created_at).toBe('string')
+                expect(response.body.article.votes).toBe(0)
+                expect(response.body.article.article_img_url).toBe("https://my_custom_image_url.com/1.jpeg")
+            })
+        })
+
+
+})
 
 describe('GET /api/articles (sorting queries)',()=>{
     test('returns all articles desc sorted as per the query when no order provided',()=>{

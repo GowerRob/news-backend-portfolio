@@ -9,6 +9,7 @@ const { getTopics,
         deleteCommentById,
         getUsers,
         postCommentByArticleId,
+        postArticle,
         getUserByUsername,
         patchCommentByCommentId} = require("./db/controllers/controllers");
 
@@ -28,6 +29,7 @@ app.delete('/api/comments/:comment_id', deleteCommentById)
 
 app.get('/api/users',getUsers)
 
+app.post('/api/articles', postArticle)
 app.get('/api/users/:username',getUserByUsername)
 
 app.patch('/api/comments/:comment_id', patchCommentByCommentId)
