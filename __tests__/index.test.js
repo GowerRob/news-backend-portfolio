@@ -135,9 +135,9 @@ describe('GET /api/articles',()=>{
 
     test('expect an array of objects with the correct keys',()=>{
         return request(app)
-        .get('/api/articles')
+        .get('/api/articles?limit=13')
         .then((response)=>{
-            expect(response.body.articles.length).not.toBe(0);
+            expect(response.body.articles.length).toBe(13);
             response.body.articles.forEach((article)=>{
                 expect(article).toMatchObject({
                     author: expect.any(String),
@@ -147,7 +147,7 @@ describe('GET /api/articles',()=>{
                     created_at: expect.any(String),
                     article_img_url: expect.any(String),
                     votes: expect.any(Number),
-                    comment_count: expect.any(String)
+                    comment_count: expect.any(Number)
                 })
             })
         })
@@ -160,17 +160,9 @@ describe('GET /api/articles',()=>{
             expect(response.body.articles).toBeSortedBy('created_at',{descending:true})
         })
     })
-
 });
 
-    test('expect a 200 when an id that exists but no comments are related to it',()=>{
-        return request(app)
-        .get('/api/articles/2/comments')
-        .expect(200)
-        .then((response)=>{
-            expect(response.body.comments.length).toBe(0);
-        })
-    })
+
 
 describe('POST /api/articles/:article_id/comments',()=>{
     test('get a 201 code',()=>{
@@ -181,6 +173,14 @@ describe('POST /api/articles/:article_id/comments',()=>{
         .send(newComment)
         .expect(201)
 
+    })
+    test('expect a 200 when an id that exists but no comments are related to it',()=>{
+        return request(app)
+        .get('/api/articles/2/comments')
+        .expect(200)
+        .then((response)=>{
+            expect(response.body.comments.length).toBe(0);
+        })
     })
     test('get a 201 code and the inserted comment returned when posting with a valid username and article id',()=>{
         const newComment=
@@ -273,7 +273,7 @@ describe('POST /api/articles/:article_id/comments',()=>{
         .get('/api/articles/999/comments')
         .expect(404)
         .then((response)=>{
-            expect(response.body.msg).toBe('No article with that id');
+            expect(response.body.msg).toBe('Article does not exist');
         })
     });
 
@@ -288,6 +288,100 @@ describe('POST /api/articles/:article_id/comments',()=>{
 
 });
 
+describe('PATCH /api/articles/:article_id',()=>{
+    test('when a valid positive patch is posted, returns a 201 code and an updated article object',()=>{
+        const patchData={inc_votes:7};
+        return request(app)
+        .patch('/api/articles/1')
+        .send(patchData)
+        .expect(201)
+        .then((response)=>{
+                expect(response.body.article).toMatchObject({
+                    article_id: 1,
+                    title: ('Living in the shadow of a great man'),
+                    topic: ('mitch'),
+                    author: ('butter_bridge'),
+                    created_at: expect.any(String),
+                    article_img_url: expect.any(String),
+                    votes: 107,
+                })
+        })
+    })
+    test('when a valid negative patch is posted, returns a 201 code and an updated article object',()=>{
+        const patchData={inc_votes:-50};
+        return request(app)
+        .patch('/api/articles/1')
+        .send(patchData)
+        .expect(201)
+        .then((response)=>{
+                expect(response.body.article).toMatchObject({
+                    article_id: 1,
+                    title: ('Living in the shadow of a great man'),
+                    topic: ('mitch'),
+                    author: ('butter_bridge'),
+                    created_at: expect.any(String),
+                    article_img_url: expect.any(String),
+                    votes: 50,
+                })
+        })
+    })
+
+    test('when an invalid patch is posted, returns a 400 and error message',()=>{
+        const patchData={inc_votes:"banana"};
+        return request(app)
+        .patch('/api/articles/1')
+        .send(patchData)
+        .expect(400)
+        .then((response)=>{
+               expect(response.body.msg).toBe('Bad request')
+        })
+    })
+
+    test('when an valid patch is posted to an article that doesnt exist eg. 88, returns a 404 and error message',()=>{
+        const patchData={inc_votes:200};
+        return request(app)
+        .patch('/api/articles/88')
+        .send(patchData)
+        .expect(404)
+        .then((response)=>{
+               expect(response.body.msg).toBe('Article does not exist')
+        })
+    })
+
+    test('when an valid patch is posted to an invalid article id eg. pen, returns a 400 and error message',()=>{
+        const patchData={inc_votes:200};
+
+        return request(app)
+        .patch('/api/articles/pen')
+        .send(patchData)
+        .expect(400)
+        .then((response)=>{
+               expect(response.body.msg).toBe('Bad request')
+        })
+    })
+    test('when a valid positive patch with extra properties is posted, returns a 201 code and an updated article object',()=>{
+        const patchData={inc_votes:7, extraKey:'hello'};
+        return request(app)
+        .patch('/api/articles/1')
+        .send(patchData)
+        .expect(201)
+        .then((response)=>{
+                expect(response.body.article).toMatchObject({
+                    article_id: 1,
+                    title: ('Living in the shadow of a great man'),
+                    topic: ('mitch'),
+                    author: ('butter_bridge'),
+                    created_at: expect.any(String),
+                    article_img_url: expect.any(String),
+                    votes: 107,
+                })
+        })
+    })
+
+
+
+
+});
 describe('DELETE /api/comments/:comment_id',()=>{
     test('returns a 204 and no content',()=>{
         return request(app)
@@ -336,6 +430,48 @@ describe('GET /api/articles/:article_id (comment_count)',()=>{
             expect(response.body.article.comment_count).toBe(0)
 
         })
+    })
+
+})
+
+describe('GET /api/articles (topic query',()=>{
+    test('return a 200 code and all articles filtered by query when a valid request is made to the api "mitch"',()=>{
+
+        return request(app)
+        .get('/api/articles?topic=mitch&limit=20')
+        .expect(200)
+        .then((response)=>{
+            expect(response.body.articles.length).toBe(12)
+            response.body.articles.forEach((article)=>{
+                expect(article).toMatchObject({
+                    author: expect.any(String),
+                    article_id: expect.any(Number),
+                    title: expect.any(String),
+                    topic: "mitch",
+                    created_at: expect.any(String),
+                    article_img_url: expect.any(String),
+                    votes: expect.any(Number),
+                    comment_count: expect.any(Number)
+                })
+            })
+        })
+    })
+    test('return a 200 code - no articles associated with query',()=>{
+        return request(app)
+        .get('/api/articles?topic=paper')
+        .expect(200)
+        .then((response)=>{
+            expect(response.body.articles.length).toBe(0)
+        })
+    })
+    test('return a 404 when topic not found',()=>{
+        return request(app)
+        .get('/api/articles?topic=pens')
+        .expect(404)
+        .then((response)=>{
+            expect(response.body.msg).toBe('No topic with that id')
+        })
+
     })
 
 })
@@ -526,3 +662,244 @@ describe('POST /api/articles',()=>{
 
 
 })
+
+describe('GET /api/articles (sorting queries)',()=>{
+    test('returns all articles desc sorted as per the query when no order provided',()=>{
+        return request(app)
+        .get('/api/articles?sort_by=title')
+        .expect(200)
+        .then((response)=>{
+            expect(response.body.articles).toBeSortedBy('title', {descending:true})
+        })
+    })
+    test('returns all articles sorted by as per the query when order provided',()=>{
+        return request(app)
+        .get('/api/articles?sort_by=votes&order=asc')
+        .expect(200)
+        .then((response)=>{
+
+            expect(response.body.articles).toBeSortedBy('votes')
+        })
+    })
+    test('returns all articles sorted by as per the query when order provided with a non-native column name',()=>{
+        return request(app)
+        .get('/api/articles?sort_by=comment_count&order=asc')
+        .expect(200)
+        .then((response)=>{
+            expect(response.body.articles).toBeSortedBy('comment_count')
+        })
+    })
+
+    test('returns all articles sorted by default (created) when asc order provided',()=>{
+        return request(app)
+        .get('/api/articles?order=asc')
+        .expect(200)
+        .then((response)=>{
+            expect(response.body.articles).toBeSortedBy('created_at')
+        })
+    })
+})
+
+
+describe('GET /api/users/:username',()=>{
+    test('get a 200 code',()=>{
+        return request(app)
+        .get('/api/users/butter_bridge')
+        .expect(200)
+    })
+    test('get a correct user object returned when given a valid exisiting user',()=>{
+        return request(app)
+        .get('/api/users/butter_bridge')
+        .expect(200)
+        .then((response)=>{
+            expect(response.body.user.username).toBe('butter_bridge');
+            expect(response.body.user.name).toBe('jonny');
+            expect(response.body.user.avatar_url).toBe('https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg');
+        })
+
+    })
+    test('get a 404 when given a non-existant user',()=>{
+        return request(app)
+        .get('/api/users/butter_fingers')
+        .expect(404)
+        .then((response)=>{
+            expect(response.body.msg).toBe('User does not exist')
+        })
+    })
+
+})
+
+describe('PATCH /api/comments/:comment_id',()=>{
+    test('when a valid patch sent to a valid comment returns a 201 and an updated comment object',()=>{
+        const patchData={ inc_votes:5};
+        return request(app)
+        .patch('/api/comments/1')
+        .send(patchData)
+        .expect(201)
+        .then((response)=>{
+            expect(response.body.comment).toMatchObject({
+                comment_id:1,
+                body:"Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+                article_id: 9,
+                votes: 21,
+            })
+
+        })
+    })
+    test('when a valid patch is sent to a non-existant comment, 404 and comment',()=>{
+        const patchData={ inc_votes:5};
+        return request(app)
+        .patch('/api/comments/999')
+        .send(patchData)
+        .expect(404)
+        .then((response)=>{
+            expect(response.body.msg).toBe("Comment does not exist")
+        })
+    })
+    test('when an valid patch is sent to an invalid comment_id, 400 and comment',()=>{
+        const patchData={ inc_votes:5};
+        return request(app)
+        .patch('/api/comments/banana')
+        .send(patchData)
+        .expect(400)
+        .then((response)=>{
+            expect(response.body.msg).toBe("Bad request")
+        })
+    })
+    test('when an invalid patch is sent to an valid comment_id',()=>{
+        const patchData={ inc_votes:"banana"};
+        return request(app)
+        .patch('/api/comments/banana')
+        .send(patchData)
+        .expect(400)
+        .then((response)=>{
+            expect(response.body.msg).toBe("Bad request")
+        })
+    })
+    test('when an valid patch is sent to an valid comment_id, but with extra properties, ignore properties',()=>{
+        const patchData={ inc_votes:6, favourite_egg:"boiled"};
+        return request(app)
+        .patch('/api/comments/1')
+        .send(patchData)
+        .expect(201)
+
+    })
+})
+
+describe('GET /api/articles (pagination)',()=>{
+    test('responds with 200 and articles according to the limit and page passed',()=>{
+        return request(app)
+        .get('/api/articles?sort_by=article_id&order=asc&limit=3&p=2')
+        .expect(200)
+        .then((response)=>{
+            expect(response.body.articles.length).toBe(3)
+            response.body.articles.forEach((article)=>{
+                expect(Number(article.article_id)).toBeGreaterThanOrEqual(4)
+                expect(Number(article.article_id)).toBeLessThan(7)
+            })
+        })
+    })
+    test('responds with 200 and default behaviour when query term omitted (p)',()=>{
+        return request(app)
+        .get('/api/articles?sort_by=article_id&order=asc&limit=6')
+        .expect(200)
+        .then((response)=>{
+            expect(response.body.articles.length).toBe(6)
+            response.body.articles.forEach((article)=>{
+                expect(Number(article.article_id)).toBeGreaterThanOrEqual(1)
+                expect(Number(article.article_id)).toBeLessThan(7)
+            })
+        })
+    })    
+    test('responds with 200 and default behaviour when query term omitted limit',()=>{
+        return request(app)
+        .get('/api/articles?sort_by=article_id&order=asc&p=2')
+        .expect(200)
+        .then((response)=>{
+            expect(response.body.articles.length).toBe(3)
+            response.body.articles.forEach((article)=>{
+                expect(Number(article.article_id)).toBeGreaterThanOrEqual(11)
+                expect(Number(article.article_id)).toBeLessThan(14)
+            })
+        })
+    })
+    test('responds with 200 and default behaviour when query both terms omitted',()=>{
+        return request(app)
+        .get('/api/articles?sort_by=article_id&order=asc')
+        .expect(200)
+        .then((response)=>{
+            expect(response.body.articles.length).toBe(10)
+            response.body.articles.forEach((article)=>{
+                expect(Number(article.article_id)).toBeGreaterThanOrEqual(1)
+                expect(Number(article.article_id)).toBeLessThan(11)
+            })
+        })
+    })
+
+    test('responds with a 200 when a request is made out of range',()=>{
+        return request(app)
+        .get('/api/articles?sort_by=article_id&order=asc&limit=10&p=5')
+        .expect(200)
+        .then((response)=>{
+            expect(response.body.articles.length).toBe(0)
+        })
+    })
+
+})
+
+describe('GET /api/articles/:article_id/comments (pagination)',()=>{
+    test('responds with 200 and comments according to the limit and page passed',()=>{
+        return request(app)
+        .get('/api/articles/1/comments?limit=3&p=1')
+        .expect(200)
+        .then((response)=>{
+            console.log("here in testing")
+            console.log(response.body.comments)
+            expect(response.body.comments.length).toBe(3)
+        })
+    })
+
+    test('responds with 200 and default behaviour when query term omitted (p)',()=>{
+        return request(app)
+        .get('/api/articles/1/comments?limit=4')
+        .expect(200)
+        .then((response)=>{
+            console.log("here in testing")
+            console.log(response.body.comments)
+            expect(response.body.comments.length).toBe(4)
+         })
+        })
+
+    test('responds with 200 and default behaviour when query term omitted (limit)',()=>{
+        return request(app)
+        .get('/api/articles/1/comments?p=1')
+        .expect(200)
+        .then((response)=>{
+            console.log("here in testing")
+            console.log(response.body.comments)
+            expect(response.body.comments.length).toBe(10)
+            })
+        })
+
+        test('responds with 200 and default behaviour when  both query terms omitted ',()=>{
+            return request(app)
+            .get('/api/articles/1/comments')
+            .expect(200)
+            .then((response)=>{
+                console.log("here in testing")
+                console.log(response.body.comments)
+                expect(response.body.comments.length).toBe(10)
+                })
+            })
+
+        test('responds with a 200 when a request is made out of range, with empty array',()=>{
+            return request(app)
+            .get('/api/articles?sort_by=article_id&order=asc&limit=10&p=6')
+            .expect(200)
+            .then((response)=>{
+                expect(response.body.articles.length).toBe(0)
+            })
+        })
+
+})
+

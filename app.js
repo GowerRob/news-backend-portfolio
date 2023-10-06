@@ -5,10 +5,13 @@ const { getTopics,
         getArticleById,
         getCommentsByArticleId,
         getAllArticles,
+        patchArticleById,
         deleteCommentById,
         getUsers,
         postCommentByArticleId,
-        postArticle} = require("./db/controllers/controllers");
+        postArticle,
+        getUserByUsername,
+        patchCommentByCommentId} = require("./db/controllers/controllers");
 
 const app = express();
 app.use(express.json());
@@ -21,11 +24,15 @@ app.get('/api/articles/:article_id/comments',getCommentsByArticleId)
 app.get('/api/articles',getAllArticles)
 app.post('/api/articles/:article_id/comments', postCommentByArticleId)
 
+app.patch('/api/articles/:article_id',patchArticleById)
 app.delete('/api/comments/:comment_id', deleteCommentById)
 
 app.get('/api/users',getUsers)
 
 app.post('/api/articles', postArticle)
+app.get('/api/users/:username',getUserByUsername)
+
+app.patch('/api/comments/:comment_id', patchCommentByCommentId)
 
 app.all('/*',(req,res,next)=>{
     res.status(404).send({msg:"bad request"})

@@ -1,7 +1,9 @@
 const db =require('../connection');
+const format= require('pg-format');
+const { topicData } = require('../data/test-data');
 
 exports.fetchTopics=()=>{
-    return db.query('SELECT * from topics;')
+    return db.query('SELECT * from topics;',)
     .then((response)=>{
         return response.rows;
     })
@@ -30,41 +32,86 @@ exports.fetchArticleById=(article_id)=>{
         })
 }
 
-
-
-exports.fetchCommentsByArticleId=(article_id)=>{
+exports.fetchCommentsByArticleId=(article_id,limit=10,p=1)=>{
+    console.log("Here in model 1", limit, p)
     const queryStr=`SELECT  comment_id,votes,
         created_at, author, 
         body,article_id
     FROM comments
     WHERE article_id =$1
-    ORDER BY created_at DESC;`
+    ORDER BY created_at DESC
+    LIMIT $2 OFFSET $3;`
 
-    return db.query(queryStr,[article_id])
+    return db.query(queryStr,[article_id,limit,((p-1)*limit)])
     .then((results)=>{
-
+        console.log("Here in model 2")
             return results.rows;
           
 
     })
 }
 
-exports.fetchAllArticles=()=>{
-    const queryStr=`SELECT  articles.author,articles.title,
+exports.fetchAllArticles = (sort_by='created_at', order='DESC', topic,limit=10,p=1)=>{
+    const values=[limit,((p-1)*limit)];
+    const validSortBy={
+        created_at:"articles.created_at",
+        title:"articles.title",
+        votes:"articles.votes",
+        author:"articles.author",
+        article_id:"articles.article_id",
+        topic:"articles.topic",
+        article_img_url:"articles.article_img_url",
+        comment_count:"comment_count"
+    }
+    const validOrders={
+        DESC:"DESC",
+        ASC:"ASC",
+        asc:"ASC",
+        desc:"DESC"
+    }
+
+    let queryStr=`SELECT articles.author,articles.title,
     articles.article_id,articles.topic,
     articles.created_at,articles.votes, 
-    articles.article_img_url, COUNT(comments.comment_id) as comment_count
+    articles.article_img_url, 
+    CAST(COUNT(comments.article_id) as INTEGER) as comment_count 
     FROM articles
-    LEFT JOIN comments On articles.article_id=comments.article_id
-    GROUP BY articles.article_id
-    ORDER BY created_at DESC;
+    LEFT JOIN comments ON articles.article_id=comments.article_id
     `
-    return db.query(queryStr)
+
+    if(topic!=undefined){
+        queryStr+=` WHERE articles.topic = $3`
+        values.push(topic)
+    }
+
+    queryStr+= ` GROUP BY articles.article_id ORDER BY ${validSortBy[sort_by]} ${validOrders[order]}
+    LIMIT $1 OFFSET $2;
+    `
+    return db.query(queryStr, values)
     .then((response)=>{
-            return response.rows;
+               return response.rows; 
     })
 }
 
+exports.updateArticleById=(patchData,article_id)=>{
+    const queryStr=`
+    UPDATE articles
+    SET votes=votes + $1
+    WHERE article_id = $2 
+    RETURNING *;
+    `
+    const values=[patchData,article_id];
+    return db.query(queryStr,values)
+    .then((response)=>{
+        if (response.rowCount === 0){
+            
+            return Promise.reject({status: 404, msg: 'Article does not exist'})
+        }   
+        else {
+            return response.rows[0] 
+        }
+    });
+}
 exports.removeCommentById=(comment_id)=>{
     return db.query(`
     DELETE FROM comments
@@ -91,11 +138,46 @@ exports.insertComment=(newComment,article_id)=>{
 }
 
 
+
 exports.fetchAllUsers=()=>{
 return db.query(`SELECT  * FROM users;`)
 .then((response)=>{
     return response.rows;
 })
+}
+
+exports.fetchUserByUsername=(username)=>{
+    return db.query(`
+    SELECT * 
+    FROM users
+    WHERE username= $1;
+    `,[username])
+    .then((response)=>{
+        if(response.rowCount===0){
+            return Promise.reject({status: 404, msg: 'User does not exist'})
+        }else{
+          return response.rows[0]  
+        }
+        
+    })
+}    
+
+exports.updateCommentByCommentId=(patchData,comment_id)=>{
+    const queryStr=`
+    UPDATE comments
+    SET votes=votes + $1
+    WHERE comment_id = $2
+    RETURNING *
+    ;`
+    const queryValues=[patchData.inc_votes, Number(comment_id)];
+    return db.query(queryStr,queryValues)
+    .then((response)=>{
+        if(response.rowCount===0){
+            return Promise.reject({status: 404, msg: 'Comment does not exist'})
+        }else{
+          return response.rows[0]  
+        }
+    })
 
 }
 
