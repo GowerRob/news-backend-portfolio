@@ -110,17 +110,6 @@ exports.updateArticleById=(patchData,article_id)=>{
         }
     });
 }
-exports.removeCommentById=(comment_id)=>{
-    return db.query(`
-    DELETE FROM comments
-    WHERE comment_id = $1
-    ;`,[comment_id])
-    .then((results)=>{
-        if(results.rowCount===0){
-            return Promise.reject({status:404, msg:'No comment with that id'})
-          }
-    })
-}
 exports.insertComment=(newComment,article_id)=>{
     const values=[newComment.body,article_id,newComment.username];
     const queryStr=`
@@ -134,16 +123,12 @@ exports.insertComment=(newComment,article_id)=>{
         return response.rows[0]
     })
 }
-
-
-
 exports.fetchAllUsers=()=>{
 return db.query(`SELECT  * FROM users;`)
 .then((response)=>{
     return response.rows;
 })
 }
-
 exports.fetchUserByUsername=(username)=>{
     return db.query(`
     SELECT * 
@@ -159,7 +144,6 @@ exports.fetchUserByUsername=(username)=>{
         
     })
 }    
-
 exports.updateCommentByCommentId=(patchData,comment_id)=>{
     const queryStr=`
     UPDATE comments
@@ -178,7 +162,6 @@ exports.updateCommentByCommentId=(patchData,comment_id)=>{
     })
 
 }
-
 exports.insertArticle=(newArticle)=>{
     const queryStr=`INSERT  INTO articles 
     (title,topic,author,body,article_img_url)
@@ -199,7 +182,6 @@ exports.insertArticle=(newArticle)=>{
         return response.rows[0];
 });
 }
-
 exports.insertTopic=(newTopic)=>{
     const queryStr=`INSERT  INTO topics
     (slug,description)
@@ -214,5 +196,28 @@ exports.insertTopic=(newTopic)=>{
     });
 
 
+
+}
+exports.removeCommentById=(comment_id)=>{
+    return db.query(`
+    DELETE FROM comments
+    WHERE comment_id = $1
+    ;`,[comment_id])
+    .then((results)=>{
+        if(results.rowCount===0){
+            return Promise.reject({status:404, msg:'No comment with that id'})
+          }
+    })
+}
+exports.removeArticleById=(article_id)=>{
+    return db.query(`
+    DELETE FROM articles
+    WHERE article_id = $1
+    ;`,[article_id])
+    .then((results)=>{
+        if(results.rowCount===0){
+            return Promise.reject({status:404, msg:'No article with that id'})
+          }
+    })
 
 }

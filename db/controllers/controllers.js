@@ -9,7 +9,8 @@ const { fetchTopics ,
         insertArticle,
         fetchUserByUsername,
         updateCommentByCommentId,
-        insertTopic} = require("../models/models");
+        insertTopic,
+        removeArticleById} = require("../models/models");
 
 const {fetchArticleByIds} = require("../models/article.models")
 const {fetchTopicsBySlug}= require("../models/topics.models.js")
@@ -24,7 +25,6 @@ exports.getTopics = (req,res,next)=>{
         next(err)
     });
 }
-
 exports.getApi = (req,res)=>{
         readFile(`endpoints.json`,"utf-8")
         .then((file)=>{
@@ -32,7 +32,6 @@ exports.getApi = (req,res)=>{
         res.status(200).send(apiData)
     })
 }
-
 exports.getArticleById = (req, res,next)=>{
     const {article_id}=req.params
     fetchArticleById(article_id)
@@ -42,7 +41,6 @@ exports.getArticleById = (req, res,next)=>{
         next(err)
     })
 }
-
 exports.getCommentsByArticleId = (req, res, next)=>{
     const {article_id}=req.params;
     const {limit,p}=req.query;
@@ -69,7 +67,6 @@ exports.getAllArticles = (req,res,next)=>{
         next(err)
     })
 }
-
 exports.deleteCommentById = (req, res,next)=>{
     const {comment_id}=req.params;
     removeCommentById(comment_id)
@@ -89,7 +86,6 @@ exports.getUsers = (req,res,next)=>{
         next(err)
     })
 }
-
 exports.postCommentByArticleId = (req,res,next)=>{
     const newComment=req.body;
     const {article_id}=req.params;
@@ -103,7 +99,6 @@ exports.postCommentByArticleId = (req,res,next)=>{
         });
 
 }
-
 exports.postArticle = (req,res,next) => {
     const newArticle=req.body;
     insertArticle(newArticle)
@@ -113,7 +108,6 @@ exports.postArticle = (req,res,next) => {
         next(err);
     });
 }
-
 exports.getUserByUsername = (req, res,next)=>{
     const {username}=req.params;
     fetchUserByUsername(username)
@@ -126,7 +120,6 @@ exports.getUserByUsername = (req, res,next)=>{
 
 
 }
-
 exports.patchCommentByCommentId = (req,res,next) => {
     const {comment_id}=req.params;
     const patchData=req.body;
@@ -161,6 +154,16 @@ exports.postTopic = (req,res,next)=>{
     });
 }
 
+exports.deleteArticleById =(req,res,next)=>{
+    const {article_id}=req.params;
+    removeArticleById(article_id)
+    .then(()=>{
+        res.status(204).send();
+    })
+    .catch((err)=>{
+        next(err);
+      });
+}
 
 
 

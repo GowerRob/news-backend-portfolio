@@ -951,5 +951,30 @@ describe('POST /api/topics',()=>{
             expect(response.body.topic.description).toBe(null)
         })
     })
+})
 
+describe('DELETE /api/articles/:article_id',()=>{
+    test('returns a 204 and no content',()=>{
+        return request(app)
+        .delete('/api/articles/2')
+        .expect(204)
+    })
+
+    test('Returns a 404 and message when an id that does not exist is provided eg. 99',()=>{
+        return request(app)
+        .delete('/api/articles/99')
+        .expect(404)
+        .then((response)=>{
+            expect(response.body.msg).toBe('No article with that id')
+        })
+    })
+
+    test('Returns a 400 and message when an id that does not exist is provided eg. mouse',()=>{
+        return request(app)
+        .delete('/api/articles/mouse')
+        .expect(400)
+        .then((response)=>{
+            expect(response.body.msg).toBe('Bad request')
+        })
+    })
 })

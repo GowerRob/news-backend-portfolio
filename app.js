@@ -12,7 +12,8 @@ const { getTopics,
         postArticle,
         getUserByUsername,
         patchCommentByCommentId,
-        postTopic} = require("./db/controllers/controllers");
+        postTopic,
+        deleteArticleById} = require("./db/controllers/controllers");
 
 const app = express();
 app.use(express.json());
@@ -36,6 +37,8 @@ app.get('/api/users/:username',getUserByUsername)
 app.patch('/api/comments/:comment_id', patchCommentByCommentId)
 
 app.post('/api/topics',postTopic)
+
+app.delete('/api/articles/:article_id',deleteArticleById)
 
 
 app.all('/*',(req,res,next)=>{
