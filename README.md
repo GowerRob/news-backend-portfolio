@@ -6,6 +6,8 @@ https://newsservicerg.onrender.com/
 ## Project description
 This project is a hosted RESTful API that allows us, through using various endpoints, to interact with a database using CRUD operations.
 The database holds information about news articles and has several related tables that interact to serve the data required.
+The SQL database is hosted on https://www.elephantsql.com/
+API is hosted on https://render.com/, which is drawing the files from a github repo.
 
 
 
