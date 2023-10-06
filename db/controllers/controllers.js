@@ -153,7 +153,6 @@ exports.patchArticleById =(req,res,next)=>{
 
 exports.postTopic = (req,res,next)=>{
     const newTopic=req.body;
-    console.log("Heere")
     insertTopic(newTopic)
     .then((topic)=>{
         res.status(201).send({topic});

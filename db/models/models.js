@@ -201,7 +201,6 @@ exports.insertArticle=(newArticle)=>{
 }
 
 exports.insertTopic=(newTopic)=>{
-    console.log(newTopic)
     const queryStr=`INSERT  INTO topics
     (slug,description)
     VALUES ($1,$2)
@@ -209,10 +208,8 @@ exports.insertTopic=(newTopic)=>{
     ;`;
 
     const values=[newTopic.slug,newTopic.description]
-
     return db.query(queryStr,values)
     .then((response)=>{
-        console.log(response.rows)
         return response.rows[0];
     });
 
