@@ -16,5 +16,6 @@ articleRouter.post('/:article_id/comments', postCommentByArticleId)
 articleRouter.patch('/:article_id',patchArticleById)
 articleRouter.post('/', postArticle)
 articleRouter.delete('/:article_id',deleteArticleById)
+articleRouter.get('/', getAllArticles);
 
 module.exports = articleRouter;
