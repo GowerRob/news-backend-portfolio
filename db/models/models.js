@@ -32,7 +32,7 @@ exports.fetchArticleById=(article_id)=>{
         })
 }
 
-exports.fetchCommentsByArticleId=(article_id,limit=10,p=1)=>{
+exports.fetchCommentsByArticleId=(article_id,limit=20,p=1)=>{
     const queryStr=`SELECT  comment_id,votes,
         created_at, author, 
         body,article_id
