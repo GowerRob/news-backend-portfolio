@@ -191,6 +191,12 @@
     "avatar_url":"https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png"}
   },
 
+  "POST /api/users": {
+    "description": "allows the addition of a new user to the users",
+    "queries": [],
+    "postedBodyFormat": {"username": "football", "name": "Footie!", "avatar_url":"http://etc" }
+  },
+
   "GET /api/users":{
     "desciprtion":"serves all the users rows",
     "queries":[],

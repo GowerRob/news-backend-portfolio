@@ -129,6 +129,8 @@ return db.query(`SELECT  * FROM users;`)
     return response.rows;
 })
 }
+
+
 exports.fetchUserByUsername=(username)=>{
     return db.query(`
     SELECT * 
@@ -162,6 +164,26 @@ exports.updateCommentByCommentId=(patchData,comment_id)=>{
     })
 
 }
+
+exports.insertUser=(newUser)=>{
+    const queryStr=`INSERT  INTO users 
+    (username,name,avatar_url)
+    VALUES ($1,$2,$3)
+    RETURNING *
+    ;`
+    const values=[newUser.username,
+        newUser.name,
+        newUser.avatar_url||"https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+    ]
+
+    return db.query(queryStr,values)
+    .then((response)=>{
+        return response.rows[0];
+});
+
+}
+
+
 exports.insertArticle=(newArticle)=>{
     const queryStr=`INSERT  INTO articles 
     (title,topic,author,body,article_img_url)

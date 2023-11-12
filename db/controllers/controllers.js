@@ -10,13 +10,15 @@ const { fetchTopics ,
         fetchUserByUsername,
         updateCommentByCommentId,
         insertTopic,
-        removeArticleById} = require("../models/models");
+        removeArticleById, 
+        insertUser} = require("../models/models");
 
 const {fetchArticleByIds} = require("../models/article.models")
 const {fetchTopicsBySlug}= require("../models/topics.models.js")
 
 const {readFile}=require('fs/promises');
 const { articleData } = require("../data/test-data");
+
 
 exports.getTopics = (req,res,next)=>{
     fetchTopics().then((topics)=>{
@@ -99,6 +101,21 @@ exports.postCommentByArticleId = (req,res,next)=>{
         });
 
 }
+
+exports.postUser = (req,res,next)=>{
+    const newUser=req.body;
+    insertUser(newUser)
+    .then((user)=>{
+        res.status(201).send({user});
+    })
+    .catch((err)=>{
+        next(err);
+    });
+
+}
+
+
+
 exports.postArticle = (req,res,next) => {
     const newArticle=req.body;
     insertArticle(newArticle)
